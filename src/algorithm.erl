@@ -38,7 +38,7 @@
 %%--------------------------------------------------------------------
 % TODO: Define specs
 edit_random_link(Cortex_Id, Probability, #{allow_recurrent_links := RecAllowed}) ->
-    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Neurons = nn_elements:neurons(edb:read(Cortex_Id)),
     Selected_Links = randomSelect([{From_Id, To_Id} || From_Id <- Neurons, To_Id <- Neurons], Probability),
     if
         RecAllowed -> [edit_random_link(From_Id, To_Id) || {From_Id, To_Id} <- Selected_Links];
@@ -62,7 +62,7 @@ edit_random_link(From_Id, To_Id) ->
 %%--------------------------------------------------------------------
 % TODO: Define specs
 edit_random_bias(Cortex_Id, Probability, #{}) ->
-    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Neurons = nn_elements:neurons(edb:read(Cortex_Id)),
     Selected_Neurons = randomSelect(Neurons, Probability),
     [mutation:edit_bias(Id, randomWeightValue()) || Id <- Selected_Neurons],
     ok.
@@ -77,7 +77,7 @@ edit_random_bias(Cortex_Id, Probability, #{}) ->
 %%--------------------------------------------------------------------
 % TODO: Define specs
 change_to_random_af(Cortex_Id, Probability, #{available_af := Functions_Weights}) ->
-    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Neurons = nn_elements:neurons(edb:read(Cortex_Id)),
     Selected_Neurons = randomSelect(Neurons, Probability),
     [mutation:change_af(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
     ok.
@@ -92,7 +92,7 @@ change_to_random_af(Cortex_Id, Probability, #{available_af := Functions_Weights}
 %%--------------------------------------------------------------------
 % TODO: Define specs
 change_to_random_aggrf(Cortex_Id, Probability, #{available_aggrf := Functions_Weights}) ->
-    Cortex = nndb:read(Cortex_Id),
+    Cortex = edb:read(Cortex_Id),
     Neurons = nn_elements:neurons(Cortex) -- nn_elements:outputs_ids(Cortex),
     Selected_Neurons = randomSelect(Neurons, Probability),
     [mutation:change_aggrf(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
@@ -109,7 +109,7 @@ change_to_random_aggrf(Cortex_Id, Probability, #{available_aggrf := Functions_We
 %%--------------------------------------------------------------------
 % TODO: Define specs
 create_neurons(Cortex_Id, MaxNet_Extension, #{available_af := Activation_FW, available_aggrf := Aggregation_FW}) ->
-    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Neurons = nn_elements:neurons(edb:read(Cortex_Id)),
     ExtensionFactor = length(Neurons) * MaxNet_Extension,
     Integer_Neurons = floor(ExtensionFactor),
     Dec = ExtensionFactor - Integer_Neurons,
@@ -132,7 +132,7 @@ create_neurons(Cortex_Id, MaxNet_Extension, #{available_af := Activation_FW, ava
 %%--------------------------------------------------------------------
 % TODO: Define specs
 remove_neurons(Cortex_Id, Die_Probability, #{}) ->
-    Neurons = nn_elements:neurons(nndb:read(Cortex_Id), hidden),
+    Neurons = nn_elements:neurons(edb:read(Cortex_Id), hidden),
     Selected_Neurons = randomSelect(Neurons, Die_Probability),
     [mutation:remove_neuron(Neuron_Id, Cortex_Id) || Neuron_Id <- Selected_Neurons],
     ok.

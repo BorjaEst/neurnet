@@ -77,6 +77,6 @@
         sensors    => Sensors,
         actuators  => Actuators,
         cycle      => 0,
-        size       => nn_elements:size(nndb:read(Cortex_Id)),
+        size       => nn_elements:size(edb:read(Cortex_Id)),
         algorithm  => ?DEFAULT_ALGORITHM
     }).

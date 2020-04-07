@@ -128,9 +128,9 @@ go(Morphology, InitialLayerDensities, MaxTime, MaxAttempts, FitnessTarget) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 change_sensors(Agent_Id, Sensors) ->
-    Agent = nndb:read(Agent_Id),
+    Agent = edb:read(Agent_Id),
     AgentProperties = Agent#agent.properties,
-    nndb:write(Agent#agent{
+    edb:write(Agent#agent{
         properties = AgentProperties#{sensors => Sensors}
     }).
 
@@ -142,9 +142,9 @@ change_sensors(Agent_Id, Sensors) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 change_actuators(Agent_Id, Actuators) ->
-    Agent = nndb:read(Agent_Id),
+    Agent = edb:read(Agent_Id),
     AgentProperties = Agent#agent.properties,
-    nndb:write(Agent#agent{
+    edb:write(Agent#agent{
         properties = AgentProperties#{actuators => Actuators}
     }).
 
@@ -158,7 +158,7 @@ mutation_function(Properties) ->
     apply_algorithms(?ALGORITHM_APPLY_ORDER, Cortex_Id, ?algorithm(Properties)),
     Properties#{
         cortex_id := Cortex_Id,
-        size      := nn_elements:size(nndb:read(Cortex_Id))
+        size      := nn_elements:size(edb:read(Cortex_Id))
     }.
 
 apply_algorithms([FunKey | Functions], Cortex_Id, Algorithm) ->

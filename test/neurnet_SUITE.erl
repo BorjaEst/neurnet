@@ -166,13 +166,13 @@ go_xor(_Config) ->
 
 
 print_results(Score, Best_Agent_Id) ->
-    Agent = nndb:read(Best_Agent_Id),
-    Cortex = nndb:read(?cortex_id(Agent#agent.properties)),
+    Agent = edb:read(Best_Agent_Id),
+    Cortex = edb:read(?cortex_id(Agent#agent.properties)),
     ct:log(?LOW_IMPORTANCE, "Best agent score: ~p", [Score]),
     ct:log(?LOW_IMPORTANCE, "Best agent body: ~p", [Agent]),
     ct:log(?LOW_IMPORTANCE, "Best agent cortex: ~p", [Cortex]),
     [print_layout(Layer, Neurons_Ids) || {Layer, Neurons_Ids} <- maps:to_list(Cortex#cortex.layers)].
 
 print_layout(Layer, Neurons_Ids) ->
-    ct:log(?LOW_IMPORTANCE, "Best agent layer ~p: ~p", [Layer, [nndb:read(Neuron_Id) || Neuron_Id <- Neurons_Ids]]).
+    ct:log(?LOW_IMPORTANCE, "Best agent layer ~p: ~p", [Layer, [edb:read(Neuron_Id) || Neuron_Id <- Neurons_Ids]]).
 
