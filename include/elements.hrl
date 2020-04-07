@@ -14,18 +14,18 @@
 %TODO: Correct specs
 -type sensor_id() :: {Unique_Id :: reference(), sensor}.
 -record(sensor, {
-	id = ?NEW_SENSOR_ID() :: sensor_id(),
-	name :: atom() | string(),
-	function :: {Module :: module(), Name :: atom()}
+    id = ?NEW_SENSOR_ID() :: sensor_id(),
+    name :: atom() | string(),
+    function :: {Module :: module(), Name :: atom()}
 }).
 
 %%% --------------------------------------------------------------------------------------------------------------------
 %TODO: Correct specs
 -type actuator_id() :: {Unique_Id :: reference(), actuator}.
 -record(actuator, {
-	id = ?NEW_ACTUATOR_ID() :: actuator_id(),
-	name :: atom() | string(),
-	function :: {Module :: module(), Name :: atom()}
+    id = ?NEW_ACTUATOR_ID() :: actuator_id(),
+    name :: atom() | string(),
+    function :: {Module :: module(), Name :: atom()}
 }).
 
 

@@ -14,12 +14,12 @@
 %%====================================================================
 
 start(_StartType, StartArgs) ->
-	neurnet:start_tables(),
-	neurnet_sup:start_link(StartArgs).
+    neurnet:start_tables(),
+    neurnet_sup:start_link(StartArgs).
 
 %%--------------------------------------------------------------------
 stop(_State) ->
-	ok.
+    ok.
 
 %%====================================================================
 %% Internal functions

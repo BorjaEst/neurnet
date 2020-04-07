@@ -18,8 +18,8 @@
 
 %% TESTS CALLS
 neurnet_SUITE() ->
-	ct:run_test([{suite, neurnet_SUITE} | ?DEFAULT_OPTIONS]).
+    ct:run_test([{suite, neurnet_SUITE} | ?DEFAULT_OPTIONS]).
 
 algorithm_SUITE() ->
-	ct:run_test([{suite, algorithm_SUITE} | ?DEFAULT_OPTIONS]).
+    ct:run_test([{suite, algorithm_SUITE} | ?DEFAULT_OPTIONS]).
 

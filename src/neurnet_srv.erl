@@ -24,8 +24,8 @@
 -define(PRINT(Message), io:format("~n ------------------~n log ~p ~n", [Message])).
 
 -record(state, {
-	real_world_id :: population_id(),
-	real_world_governor :: pid()
+    real_world_id :: population_id(),
+    real_world_governor :: pid()
 }).
 
 %%%===================================================================
@@ -39,7 +39,7 @@
 %% @end
 %%--------------------------------------------------------------------
 start_link(StartArgs) ->
-	gen_server:start_link({local, ?SERVER}, ?MODULE, StartArgs, []).
+    gen_server:start_link({local, ?SERVER}, ?MODULE, StartArgs, []).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -48,9 +48,9 @@ start_link(StartArgs) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(print(Message :: term()) ->
-	ok).
+    ok).
 print(Message) ->
-	gen_server:cast(?SERVER, {print, Message}).
+    gen_server:cast(?SERVER, {print, Message}).
 
 
 %%%===================================================================
@@ -69,17 +69,17 @@ print(Message) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-	{ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
-	{stop, Reason :: term()} | ignore).
+    {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
+    {stop, Reason :: term()} | ignore).
 init([]) ->
-	RealWorld_Id = eevo:create_population(?REAL_WORLD_POPULATION_SPECS),
-	{ok, Governor} = eevo:start_population(RealWorld_Id),
-	register(?REAL_WORLD_GOVERNOR, Governor),
-	?PRINT(?WELCOME_MESSAGE),
-	{ok, #state{
-		real_world_id       = RealWorld_Id,
-		real_world_governor = Governor
-	}}.
+    RealWorld_Id = eevo:create_population(?REAL_WORLD_POPULATION_SPECS),
+    {ok, Governor} = eevo:start_population(RealWorld_Id),
+    register(?REAL_WORLD_GOVERNOR, Governor),
+    ?PRINT(?WELCOME_MESSAGE),
+    {ok, #state{
+        real_world_id       = RealWorld_Id,
+        real_world_governor = Governor
+    }}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -90,14 +90,14 @@ init([]) ->
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
                   State :: #state{}) ->
-	                 {reply, Reply :: term(), NewState :: #state{}} |
-	                 {reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
-	                 {noreply, NewState :: #state{}} |
-	                 {noreply, NewState :: #state{}, timeout() | hibernate} |
-	                 {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
-	                 {stop, Reason :: term(), NewState :: #state{}}).
+                     {reply, Reply :: term(), NewState :: #state{}} |
+                     {reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
+                     {noreply, NewState :: #state{}} |
+                     {noreply, NewState :: #state{}, timeout() | hibernate} |
+                     {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
+                     {stop, Reason :: term(), NewState :: #state{}}).
 handle_call(_Request, _From, State) ->
-	{reply, ok, State}.
+    {reply, ok, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -107,16 +107,16 @@ handle_call(_Request, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_cast(Request :: term(), State :: #state{}) ->
-	{noreply, NewState :: #state{}} |
-	{noreply, NewState :: #state{}, timeout() | hibernate} |
-	{stop, Reason :: term(), NewState :: #state{}}).
+    {noreply, NewState :: #state{}} |
+    {noreply, NewState :: #state{}, timeout() | hibernate} |
+    {stop, Reason :: term(), NewState :: #state{}}).
 
 handle_cast({print, Message}, State) ->
-	?PRINT(Message),
-	{noreply, State};
+    ?PRINT(Message),
+    {noreply, State};
 
 handle_cast(_Request, State) ->
-	{noreply, State}.
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -129,11 +129,11 @@ handle_cast(_Request, State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: timeout() | term(), State :: #state{}) ->
-	{noreply, NewState :: #state{}} |
-	{noreply, NewState :: #state{}, timeout() | hibernate} |
-	{stop, Reason :: term(), NewState :: #state{}}).
+    {noreply, NewState :: #state{}} |
+    {noreply, NewState :: #state{}, timeout() | hibernate} |
+    {stop, Reason :: term(), NewState :: #state{}}).
 handle_info(_Info, State) ->
-	{noreply, State}.
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -149,7 +149,7 @@ handle_info(_Info, State) ->
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
                 State :: #state{}) -> term()).
 terminate(_Reason, _State) ->
-	ok.
+    ok.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -161,9 +161,9 @@ terminate(_Reason, _State) ->
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down, term()}, State :: #state{},
                   Extra :: term()) ->
-	                 {ok, NewState :: #state{}} | {error, Reason :: term()}).
+                     {ok, NewState :: #state{}} | {error, Reason :: term()}).
 code_change(_OldVsn, State, _Extra) ->
-	{ok, State}.
+    {ok, State}.
 
 %%%===================================================================
 %%% Internal functions

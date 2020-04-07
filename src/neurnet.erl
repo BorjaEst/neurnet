@@ -27,10 +27,10 @@
 -define(FITNESS_TARGET, infinity).
 -define(ARCHITECTURE(Layers), enn:sequential(Layers)).
 -define(NEURNET_TABLES_ATTRIBUTES_LIST,
-	[
-		{sensor, record_info(fields, sensor)},
-		{actuator, record_info(fields, actuator)}
-	]).
+    [
+        {sensor, record_info(fields, sensor)},
+        {actuator, record_info(fields, actuator)}
+    ]).
 
 %%%===================================================================
 %%% API
@@ -44,11 +44,11 @@
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 start_tables() ->
-	Tables = ?NEURNET_TABLES_ATTRIBUTES_LIST ++
-	         eevo:attributes_table() ++
-	         enn:attributes_table(),
-	nndb:create_tables(Tables),
-	nndb:start(Tables).
+    Tables = ?NEURNET_TABLES_ATTRIBUTES_LIST ++
+             eevo:attributes_table() ++
+             enn:attributes_table(),
+    nndb:create_tables(Tables),
+    nndb:start(Tables).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -58,16 +58,16 @@ start_tables() ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 seed(#{sensors := Sensors, actuators := Actuators} = _Morphology, InitialLayerDensities) ->
-	Cortex_Id = enn:compile(?ARCHITECTURE(
-		lists:append([
-			             [?input(length(Sensors))],
-			             InitialLayerDensities,
-			             [?output(length(Actuators))]
-		             ]))),
-	eevo:create_agent(nn_agent,
-	                  ?nn_properties(Sensors, Actuators, Cortex_Id),
-	                  fun mutation_function/1
-	).
+    Cortex_Id = enn:compile(?ARCHITECTURE(
+        lists:append([
+                         [?input(length(Sensors))],
+                         InitialLayerDensities,
+                         [?output(length(Actuators))]
+                     ]))),
+    eevo:create_agent(nn_agent,
+                      ?nn_properties(Sensors, Actuators, Cortex_Id),
+                      fun mutation_function/1
+    ).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -77,7 +77,7 @@ seed(#{sensors := Sensors, actuators := Actuators} = _Morphology, InitialLayerDe
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 start_agent(Agent_Id) ->
-	{ok, _Agent_PId} = eevo:start_agent(?REAL_WORLD_ID, Agent_Id).
+    {ok, _Agent_PId} = eevo:start_agent(?REAL_WORLD_ID, Agent_Id).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -87,7 +87,7 @@ start_agent(Agent_Id) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 stop_agent(Agent_Id) ->
-	ok = eevo:stop_agent(?REAL_WORLD_ID, Agent_Id).
+    ok = eevo:stop_agent(?REAL_WORLD_ID, Agent_Id).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -97,20 +97,20 @@ stop_agent(Agent_Id) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 go(Morphology, InitialLayerDensities) ->
-	go(Morphology, InitialLayerDensities, ?MAX_TIME, ?MAX_ATTEMPTS, ?FITNESS_TARGET).
+    go(Morphology, InitialLayerDensities, ?MAX_TIME, ?MAX_ATTEMPTS, ?FITNESS_TARGET).
 go(Morphology, InitialLayerDensities, MaxTime, MaxAttempts, FitnessTarget) ->
-	Seed_Id = seed(Morphology, InitialLayerDensities),
-	Population_Id = eevo:create_population(
-		[
-			{run_time, MaxTime},
-			{run_agents, MaxAttempts},
-			{run_score, FitnessTarget}
-		]),
-	{ok, _Gov_PId} = eevo:start_population(Population_Id), %% TODO: Make Result = eevo:start_population(Id, Seeds),
-	ok = eevo:add_agent(Population_Id, Seed_Id),
-	Result = receive {run_end, Population_Id, R} -> R end,
-	?LOG_NOTICE("Training results: ~p", [Result]),
-	{_Score, _Best_Agent_Id} = maps:get(best_score, Result).
+    Seed_Id = seed(Morphology, InitialLayerDensities),
+    Population_Id = eevo:create_population(
+        [
+            {run_time, MaxTime},
+            {run_agents, MaxAttempts},
+            {run_score, FitnessTarget}
+        ]),
+    {ok, _Gov_PId} = eevo:start_population(Population_Id), %% TODO: Make Result = eevo:start_population(Id, Seeds),
+    ok = eevo:add_agent(Population_Id, Seed_Id),
+    Result = receive {run_end, Population_Id, R} -> R end,
+    ?LOG_NOTICE("Training results: ~p", [Result]),
+    {_Score, _Best_Agent_Id} = maps:get(best_score, Result).
 
 
 %%--------------------------------------------------------------------
@@ -121,11 +121,11 @@ go(Morphology, InitialLayerDensities, MaxTime, MaxAttempts, FitnessTarget) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 change_sensors(Agent_Id, Sensors) ->
-	Agent = nndb:read(Agent_Id),
-	AgentProperties = Agent#agent.properties,
-	nndb:write(Agent#agent{
-		properties = AgentProperties#{sensors => Sensors}
-	}).
+    Agent = nndb:read(Agent_Id),
+    AgentProperties = Agent#agent.properties,
+    nndb:write(Agent#agent{
+        properties = AgentProperties#{sensors => Sensors}
+    }).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -135,11 +135,11 @@ change_sensors(Agent_Id, Sensors) ->
 %%--------------------------------------------------------------------
 %TODO: Correct specs
 change_actuators(Agent_Id, Actuators) ->
-	Agent = nndb:read(Agent_Id),
-	AgentProperties = Agent#agent.properties,
-	nndb:write(Agent#agent{
-		properties = AgentProperties#{actuators => Actuators}
-	}).
+    Agent = nndb:read(Agent_Id),
+    AgentProperties = Agent#agent.properties,
+    nndb:write(Agent#agent{
+        properties = AgentProperties#{actuators => Actuators}
+    }).
 
 
 %%%===================================================================
@@ -147,23 +147,23 @@ change_actuators(Agent_Id, Actuators) ->
 %%%===================================================================
 
 mutation_function(Properties) ->
-	Cortex_Id = enn:clone(?cortex_id(Properties)),
-	apply_algorithms(?ALGORITHM_APPLY_ORDER, Cortex_Id, ?algorithm(Properties)),
-	Properties#{
-		cortex_id := Cortex_Id,
-		size      := nn_elements:size(nndb:read(Cortex_Id))
-	}.
+    Cortex_Id = enn:clone(?cortex_id(Properties)),
+    apply_algorithms(?ALGORITHM_APPLY_ORDER, Cortex_Id, ?algorithm(Properties)),
+    Properties#{
+        cortex_id := Cortex_Id,
+        size      := nn_elements:size(nndb:read(Cortex_Id))
+    }.
 
 apply_algorithms([FunKey | Functions], Cortex_Id, Algorithm) ->
-	Value = maps:get(FunKey, Algorithm),
-	try
-		algorithm:FunKey(Cortex_Id, Value, Algorithm)
-	catch
-		Type:Exception -> ?LOG_NOTICE("Algorithm application ~p failed: {~p, ~p}", [FunKey, Type, Exception])
-	end,
-	apply_algorithms(Functions, Cortex_Id, Algorithm);
+    Value = maps:get(FunKey, Algorithm),
+    try
+        algorithm:FunKey(Cortex_Id, Value, Algorithm)
+    catch
+        Type:Exception -> ?LOG_NOTICE("Algorithm application ~p failed: {~p, ~p}", [FunKey, Type, Exception])
+    end,
+    apply_algorithms(Functions, Cortex_Id, Algorithm);
 apply_algorithms([], _Cortex_Id, _Algorithm) ->
-	ok.
+    ok.
 
 
 

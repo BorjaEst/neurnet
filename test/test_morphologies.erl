@@ -28,32 +28,32 @@
 % ....................................................................
 % TODO: Define specs and comments
 sum_mimic() ->
-	#{
-		sensors =>
-		[
-			#sensor{name = val_GetInput1, function = {test_sensors, val_sns}},
-			#sensor{name = val_GetInput2, function = {test_sensors, val_sns}}
-		],
-		actuators =>
-		[
-			#actuator{name = sum_SetOutput, function = {test_actuators, sum_act}}
-		]
-	}.
+    #{
+        sensors =>
+        [
+            #sensor{name = val_GetInput1, function = {test_sensors, val_sns}},
+            #sensor{name = val_GetInput2, function = {test_sensors, val_sns}}
+        ],
+        actuators =>
+        [
+            #actuator{name = sum_SetOutput, function = {test_actuators, sum_act}}
+        ]
+    }.
 
 % ....................................................................
 % TODO: Define specs and comments
 xor_mimic() ->
-	#{
-		sensors =>
-		[
-			#sensor{name = xor_GetInput1, function = {test_sensors, xor_sns1}},
-			#sensor{name = xor_GetInput2, function = {test_sensors, xor_sns2}}
-		],
-		actuators =>
-		[
-			#actuator{name = xor_SetOutput, function = {test_actuators, xor_act}}
-		]
-	}.
+    #{
+        sensors =>
+        [
+            #sensor{name = xor_GetInput1, function = {test_sensors, xor_sns1}},
+            #sensor{name = xor_GetInput2, function = {test_sensors, xor_sns2}}
+        ],
+        actuators =>
+        [
+            #actuator{name = xor_SetOutput, function = {test_actuators, xor_act}}
+        ]
+    }.
 
 
 

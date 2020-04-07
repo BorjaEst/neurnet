@@ -21,7 +21,7 @@
 %% Info = [tuple()]
 %%--------------------------------------------------------------------
 suite() ->
-	[{timetrap, {seconds, 20}}].
+    [{timetrap, {seconds, 20}}].
 
 %%--------------------------------------------------------------------
 %% Function: init_per_suite(Config0) ->
@@ -30,16 +30,16 @@ suite() ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 init_per_suite(Config) ->
-	application:start(neurnet),
-	Config.
+    application:start(neurnet),
+    Config.
 
 %%--------------------------------------------------------------------
 %% Function: end_per_suite(Config0) -> term() | {save_config,Config1}
 %% Config0 = Config1 = [tuple()]
 %%--------------------------------------------------------------------
 end_per_suite(_Config) ->
-	application:stop(neurnet),
-	ok.
+    application:stop(neurnet),
+    ok.
 
 %%--------------------------------------------------------------------
 %% Function: init_per_group(GroupName, Config0) ->
@@ -49,7 +49,7 @@ end_per_suite(_Config) ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 init_per_group(_GroupName, Config) ->
-	Config.
+    Config.
 
 %%--------------------------------------------------------------------
 %% Function: end_per_group(GroupName, Config0) ->
@@ -58,7 +58,7 @@ init_per_group(_GroupName, Config) ->
 %% Config0 = Config1 = [tuple()]
 %%--------------------------------------------------------------------
 end_per_group(_GroupName, _Config) ->
-	ok.
+    ok.
 
 %%--------------------------------------------------------------------
 %% Function: init_per_testcase(TestCase, Config0) ->
@@ -68,7 +68,7 @@ end_per_group(_GroupName, _Config) ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 init_per_testcase(_GroupName, Config) ->
-	Config.
+    Config.
 
 %%--------------------------------------------------------------------
 %% Function: end_per_testcase(TestCase, Config0) ->
@@ -78,7 +78,7 @@ init_per_testcase(_GroupName, Config) ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 end_per_testcase(_TestCase, _Config) ->
-	ok.
+    ok.
 
 %%--------------------------------------------------------------------
 %% Function: groups() -> [Group]
@@ -93,12 +93,12 @@ end_per_testcase(_TestCase, _Config) ->
 %% N = integer() | forever
 %%--------------------------------------------------------------------
 groups() ->
-	[
-		{test_for_multiple_trainings, [parallel],  % TODO: Make this tests
-		 [addition_static_inputs,
-		  addition_random_inputs |
-		  [random_dense_random_inputs || _ <- lists:seq(1, ?PARALLEL_TRAININGS - 1)]]}
-	].
+    [
+        {test_for_multiple_trainings, [parallel],  % TODO: Make this tests
+         [addition_static_inputs,
+          addition_random_inputs |
+          [random_dense_random_inputs || _ <- lists:seq(1, ?PARALLEL_TRAININGS - 1)]]}
+    ].
 
 %%--------------------------------------------------------------------
 %% Function: all() -> GroupsAndTestCases | {skip,Reason}
@@ -108,18 +108,18 @@ groups() ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 all() ->
-	[
-		go_sum,
-		go_xor
-%%		{group, test_for_multiple_trainings}
-	].
+    [
+        go_sum,
+        go_xor
+%%        {group, test_for_multiple_trainings}
+    ].
 
 %%--------------------------------------------------------------------
 %% Function: TestCase() -> Info
 %% Info = [tuple()]
 %%--------------------------------------------------------------------
 my_test_case_example() ->
-	[].
+    [].
 
 %%--------------------------------------------------------------------
 %% Function: TestCase(Config0) ->
@@ -130,49 +130,49 @@ my_test_case_example() ->
 %% Comment = term()
 %%--------------------------------------------------------------------
 my_test_case_example(_Config) ->
-	ok.
+    ok.
 
 % --------------------------------------------------------------------
 % TESTS --------------------------------------------------------------
 
 % ....................................................................
 go_sum() ->
-	[].
+    [].
 go_sum(_Config) ->
-	{Score, Best_Agent_Id} = neurnet:go(
-		_Morphology = test_morphologies:sum_mimic(),
-		_InitialLayerDensities = [?dense(2, #{activation => tanh})],
-		_MaxTime = infinity,        % Optional
-		_MaxAttempts = infinity,    % Optional
-		_FitnessTarget = 99.9       % Optional
-	),
-	print_results(Score, Best_Agent_Id).
+    {Score, Best_Agent_Id} = neurnet:go(
+        _Morphology = test_morphologies:sum_mimic(),
+        _InitialLayerDensities = [?dense(2, #{activation => tanh})],
+        _MaxTime = infinity,        % Optional
+        _MaxAttempts = infinity,    % Optional
+        _FitnessTarget = 99.9       % Optional
+    ),
+    print_results(Score, Best_Agent_Id).
 
 % ....................................................................
 go_xor() ->
-	[].
+    [].
 go_xor(_Config) ->
-	{Score, Best_Agent_Id} = neurnet:go(
-		_Morphology = test_morphologies:xor_mimic(),
-		_InitialLayerDensities = [?dense(2, #{activation => tanh})],
-		_MaxTime = infinity,        % Optional
-		_MaxAttempts = infinity,    % Optional
-		_FitnessTarget = 99.9       % Optional
-	),
-	print_results(Score, Best_Agent_Id).
+    {Score, Best_Agent_Id} = neurnet:go(
+        _Morphology = test_morphologies:xor_mimic(),
+        _InitialLayerDensities = [?dense(2, #{activation => tanh})],
+        _MaxTime = infinity,        % Optional
+        _MaxAttempts = infinity,    % Optional
+        _FitnessTarget = 99.9       % Optional
+    ),
+    print_results(Score, Best_Agent_Id).
 
 % --------------------------------------------------------------------
 % SPECIFIC HELPER FUNCTIONS --------------------------------------------------------------------------------------------
 
 
 print_results(Score, Best_Agent_Id) ->
-	Agent = nndb:read(Best_Agent_Id),
-	Cortex = nndb:read(?cortex_id(Agent#agent.properties)),
-	ct:log(?LOW_IMPORTANCE, "Best agent score: ~p", [Score]),
-	ct:log(?LOW_IMPORTANCE, "Best agent body: ~p", [Agent]),
-	ct:log(?LOW_IMPORTANCE, "Best agent cortex: ~p", [Cortex]),
-	[print_layout(Layer, Neurons_Ids) || {Layer, Neurons_Ids} <- maps:to_list(Cortex#cortex.layers)].
+    Agent = nndb:read(Best_Agent_Id),
+    Cortex = nndb:read(?cortex_id(Agent#agent.properties)),
+    ct:log(?LOW_IMPORTANCE, "Best agent score: ~p", [Score]),
+    ct:log(?LOW_IMPORTANCE, "Best agent body: ~p", [Agent]),
+    ct:log(?LOW_IMPORTANCE, "Best agent cortex: ~p", [Cortex]),
+    [print_layout(Layer, Neurons_Ids) || {Layer, Neurons_Ids} <- maps:to_list(Cortex#cortex.layers)].
 
 print_layout(Layer, Neurons_Ids) ->
-	ct:log(?LOW_IMPORTANCE, "Best agent layer ~p: ~p", [Layer, [nndb:read(Neuron_Id) || Neuron_Id <- Neurons_Ids]]).
+    ct:log(?LOW_IMPORTANCE, "Best agent layer ~p: ~p", [Layer, [nndb:read(Neuron_Id) || Neuron_Id <- Neurons_Ids]]).
 

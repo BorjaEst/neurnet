@@ -31,31 +31,31 @@
 % ....................................................................
 % TODO: Define specs and comments
 val_sns(#{values := Values} = Properties) ->
-	Signal = ?VAL_TEST_SIGNAL,
-	{Signal, Properties#{
-		values := [Signal | Values]
-	}};
+    Signal = ?VAL_TEST_SIGNAL,
+    {Signal, Properties#{
+        values := [Signal | Values]
+    }};
 val_sns(#{} = Properties) ->
-	val_sns(Properties#{
-		values => []
-	}).
+    val_sns(Properties#{
+        values => []
+    }).
 
 % ....................................................................
 % TODO: Define specs and comments
 xor_sns1(#{xor_1 := [Signal | _]} = Properties) ->
-	{Signal, Properties};
+    {Signal, Properties};
 xor_sns1(#{} = Properties) ->
-	Inputs = [Signal | _] = ?XOR_TEST_SEQ1,
-	{Signal, Properties#{
-		xor_1 => Inputs
-	}}.
+    Inputs = [Signal | _] = ?XOR_TEST_SEQ1,
+    {Signal, Properties#{
+        xor_1 => Inputs
+    }}.
 
 xor_sns2(#{xor_2 := [Signal | _]} = Properties) ->
-	{Signal, Properties};
+    {Signal, Properties};
 xor_sns2(#{} = Properties) ->
-	Inputs = [Signal | _] = ?XOR_TEST_SEQ2,
-	{Signal, Properties#{
-		xor_2 => Inputs
-	}}.
+    Inputs = [Signal | _] = ?XOR_TEST_SEQ2,
+    {Signal, Properties#{
+        xor_2 => Inputs
+    }}.
 
 

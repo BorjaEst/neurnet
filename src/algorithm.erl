@@ -40,20 +40,20 @@
 %%--------------------------------------------------------------------
 % TODO: Define specs
 edit_random_link(Cortex_Id, Probability, #{allow_recurrent_links := RecAllowed}) ->
-	Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
-	Selected_Links = randomSelect([{From_Id, To_Id} || From_Id <- Neurons, To_Id <- Neurons], Probability),
-	if
-		RecAllowed -> [edit_random_link(From_Id, To_Id) || {From_Id, To_Id} <- Selected_Links];
-		true -> [edit_random_link(From_Id, To_Id) || {{L1, _} = From_Id, {L2, _} = To_Id} <- Selected_Links, L1 < L2]
-	end,
-	ok.
+    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Selected_Links = randomSelect([{From_Id, To_Id} || From_Id <- Neurons, To_Id <- Neurons], Probability),
+    if
+        RecAllowed -> [edit_random_link(From_Id, To_Id) || {From_Id, To_Id} <- Selected_Links];
+        true -> [edit_random_link(From_Id, To_Id) || {{L1, _} = From_Id, {L2, _} = To_Id} <- Selected_Links, L1 < L2]
+    end,
+    ok.
 
 edit_random_link(From_Id, To_Id) ->
-	try
-		mutation:create_link(From_Id, To_Id)
-	catch
-		error:{link_fail, _} -> mutation:edit_link(From_Id, To_Id, rand:normal(0, ?DELTA_MULTIPLIER/10.0))
-	end.
+    try
+        mutation:create_link(From_Id, To_Id)
+    catch
+        error:{link_fail, _} -> mutation:edit_link(From_Id, To_Id, rand:normal(0, ?DELTA_MULTIPLIER/10.0))
+    end.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -64,10 +64,10 @@ edit_random_link(From_Id, To_Id) ->
 %%--------------------------------------------------------------------
 % TODO: Define specs
 edit_random_bias(Cortex_Id, Probability, #{}) ->
-	Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
-	Selected_Neurons = randomSelect(Neurons, Probability),
-	[mutation:edit_bias(Id, randomWeightValue()) || Id <- Selected_Neurons],
-	ok.
+    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Selected_Neurons = randomSelect(Neurons, Probability),
+    [mutation:edit_bias(Id, randomWeightValue()) || Id <- Selected_Neurons],
+    ok.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -79,10 +79,10 @@ edit_random_bias(Cortex_Id, Probability, #{}) ->
 %%--------------------------------------------------------------------
 % TODO: Define specs
 change_to_random_af(Cortex_Id, Probability, #{available_af := Functions_Weights}) ->
-	Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
-	Selected_Neurons = randomSelect(Neurons, Probability),
-	[mutation:change_af(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
-	ok.
+    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    Selected_Neurons = randomSelect(Neurons, Probability),
+    [mutation:change_af(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
+    ok.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -94,11 +94,11 @@ change_to_random_af(Cortex_Id, Probability, #{available_af := Functions_Weights}
 %%--------------------------------------------------------------------
 % TODO: Define specs
 change_to_random_aggrf(Cortex_Id, Probability, #{available_aggrf := Functions_Weights}) ->
-	Cortex = nndb:read(Cortex_Id),
-	Neurons = nn_elements:neurons(Cortex) -- nn_elements:outputs_ids(Cortex),
-	Selected_Neurons = randomSelect(Neurons, Probability),
-	[mutation:change_aggrf(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
-	ok.
+    Cortex = nndb:read(Cortex_Id),
+    Neurons = nn_elements:neurons(Cortex) -- nn_elements:outputs_ids(Cortex),
+    Selected_Neurons = randomSelect(Neurons, Probability),
+    [mutation:change_aggrf(Id, weightSelection(Functions_Weights)) || Id <- Selected_Neurons],
+    ok.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -111,19 +111,19 @@ change_to_random_aggrf(Cortex_Id, Probability, #{available_aggrf := Functions_We
 %%--------------------------------------------------------------------
 % TODO: Define specs
 create_neurons(Cortex_Id, MaxNet_Extension, #{available_af := Activation_FW, available_aggrf := Aggregation_FW}) ->
-	Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
-	ExtensionFactor = length(Neurons) * MaxNet_Extension,
-	Integer_Neurons = floor(ExtensionFactor),
-	Dec = ExtensionFactor - Integer_Neurons,
-	case rand:uniform() of
-		Prob when Prob > Dec -> N_NewNeurons = Integer_Neurons;
-		Prob when Prob =< Dec -> N_NewNeurons = Integer_Neurons + 1
-	end,
-	[mutation:insert_neuron((rand:uniform(198) - 99) / 100,
-	                        weightSelection(Activation_FW),
-	                        weightSelection(Aggregation_FW),
-	                        Cortex_Id)
-	 || _ <- lists:seq(1, N_NewNeurons)].
+    Neurons = nn_elements:neurons(nndb:read(Cortex_Id)),
+    ExtensionFactor = length(Neurons) * MaxNet_Extension,
+    Integer_Neurons = floor(ExtensionFactor),
+    Dec = ExtensionFactor - Integer_Neurons,
+    case rand:uniform() of
+        Prob when Prob > Dec -> N_NewNeurons = Integer_Neurons;
+        Prob when Prob =< Dec -> N_NewNeurons = Integer_Neurons + 1
+    end,
+    [mutation:insert_neuron((rand:uniform(198) - 99) / 100,
+                            weightSelection(Activation_FW),
+                            weightSelection(Aggregation_FW),
+                            Cortex_Id)
+     || _ <- lists:seq(1, N_NewNeurons)].
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -134,10 +134,10 @@ create_neurons(Cortex_Id, MaxNet_Extension, #{available_af := Activation_FW, ava
 %%--------------------------------------------------------------------
 % TODO: Define specs
 remove_neurons(Cortex_Id, Die_Probability, #{}) ->
-	Neurons = nn_elements:neurons(nndb:read(Cortex_Id), hidden),
-	Selected_Neurons = randomSelect(Neurons, Die_Probability),
-	[mutation:remove_neuron(Neuron_Id, Cortex_Id) || Neuron_Id <- Selected_Neurons],
-	ok.
+    Neurons = nn_elements:neurons(nndb:read(Cortex_Id), hidden),
+    Selected_Neurons = randomSelect(Neurons, Die_Probability),
+    [mutation:remove_neuron(Neuron_Id, Cortex_Id) || Neuron_Id <- Selected_Neurons],
+    ok.
 
 
 %%====================================================================
@@ -161,8 +161,8 @@ randomFirsts(List, N) -> element(1, lists:split(N, randomShuffling(List))).
 
 % ....................................................................
 weightSelection(FunctionWeight_List) ->
-	List = lists:append([lists:duplicate(W, Function) || {Function, W} <- FunctionWeight_List]),
-	randomElement(List).
+    List = lists:append([lists:duplicate(W, Function) || {Function, W} <- FunctionWeight_List]),
+    randomElement(List).
 
 
 %%====================================================================
@@ -172,26 +172,26 @@ weightSelection(FunctionWeight_List) ->
 % --------------------------------------------------------------------
 % TESTS DESCRIPTIONS -------------------------------------------------
 this_example_test_() ->
-	% {setup, Where, Setup, Cleanup, Tests | Instantiator}
-	[
-		{"Test example",
-		 {setup, local, fun no_setup/0, fun no_cleanup/1, fun test_example/1}}
-	].
+    % {setup, Where, Setup, Cleanup, Tests | Instantiator}
+    [
+        {"Test example",
+         {setup, local, fun no_setup/0, fun no_cleanup/1, fun test_example/1}}
+    ].
 
 % --------------------------------------------------------------------
 % SPECIFIC SETUP FUNCTIONS -------------------------------------------
 no_setup() ->
-	ok.
+    ok.
 
 no_cleanup(_) ->
-	ok.
+    ok.
 
 % --------------------------------------------------------------------
 % ACTUAL TESTS -------------------------------------------------------
 test_example(_) ->
-	[
-		?_assertEqual(true, true)
-	].
+    [
+        ?_assertEqual(true, true)
+    ].
 
 
 % --------------------------------------------------------------------
@@ -199,8 +199,8 @@ test_example(_) ->
 
 
 
-	
-	
+    
+    
 
 
 
