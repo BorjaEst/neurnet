@@ -3,7 +3,7 @@
      {vsn, "0.1.0"},
      {modules, []}, %% TODO
      {registered, []}, %% TODO
-     {included_applications, [eevo, enn]},
+     {included_applications, [eevo, enn, edb]},
      {mod, {neurnet_app, []}},
      {applications, [kernel, stdlib]},
      {env, []},

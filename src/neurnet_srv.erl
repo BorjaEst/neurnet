@@ -1,10 +1,8 @@
 %%%-------------------------------------------------------------------
 %%% @author borja
-%%% @copyright (C) 2018, <COMPANY>
 %%% @doc
 %%%
 %%% @end
-%%% Created : 22. Sep 2018 19:05
 %%%-------------------------------------------------------------------
 -module(neurnet_srv).
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build

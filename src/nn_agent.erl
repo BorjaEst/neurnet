@@ -1,10 +1,8 @@
 %%%-------------------------------------------------------------------
 %%% @author borja
-%%% @copyright (C) 2018, <COMPANY>
 %%% @doc
 %%%
 %%% @end
-%%% Created : 24. Dec 2018 20:46
 %%%-------------------------------------------------------------------
 -module(nn_agent).
 -compile([export_all, nowarn_export_all]). %% TODO: To delete after build
