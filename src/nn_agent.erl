@@ -145,7 +145,7 @@ terminate(_Reason, _State) ->
 %%% Internal functions
 %%%===================================================================
 
-% ......................................................................................................................
+% ....................................................................
 cast_sensors(Sensors, Properties) ->
 	spawn_link(nn_agent, cast_sensors, [self(), Sensors, Properties]).
 
@@ -159,7 +159,7 @@ exec_sensors([#sensor{function = {M, Sensor}} | SRest], Properties, SignalsAcc) 
 exec_sensors([] = _Sensors, Properties, SignalsAcc) ->
 	{lists:reverse(SignalsAcc), Properties}.
 
-% ......................................................................................................................
+% ....................................................................
 cast_actuators(Actuators, Properties, Outputs) ->
 	spawn_link(nn_agent, cast_actuators, [self(), Actuators, Properties, Outputs]).
 

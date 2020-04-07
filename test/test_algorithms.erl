@@ -26,7 +26,7 @@
 %%% Defined Actuators
 %%%===================================================================
 
-% ......................................................................................................................
+% ....................................................................
 % TODO: Define specs and comments
 simple_edit_weights() ->
 	_Mutation_algorithm = #{
@@ -34,7 +34,7 @@ simple_edit_weights() ->
 		edit_random_bias    => 0.01  % %_OfHit on each bias
 	}.
 
-% ......................................................................................................................
+% ....................................................................
 % TODO: Define specs and comments
 create_and_remove_links() ->
 	_Mutation_algorithm = #{
@@ -43,7 +43,7 @@ create_and_remove_links() ->
 		remove_random_link     => 0.01  % %OfPossible active links
 	}.
 
-% ......................................................................................................................
+% ....................................................................
 % TODO: Define specs and comments
 activation_and_aggregation() ->
 	_Mutation_algorithm = #{
@@ -53,7 +53,7 @@ activation_and_aggregation() ->
 		change_to_random_aggrf => 0.01                          % %_OfHit on each neuron
 	}.
 
-% ......................................................................................................................
+% ....................................................................
 % TODO: Define specs and comments
 change_architecture() ->
 	_Mutation_algorithm = #{
@@ -63,7 +63,7 @@ change_architecture() ->
 		remove_neurons  => 0.05                       % %_ofMaxNetwork reduction
 	}.
 
-% ......................................................................................................................
+% ....................................................................
 % TODO: Define specs and comments
 complex_architecture() ->
 	_Mutation_algorithm = #{
