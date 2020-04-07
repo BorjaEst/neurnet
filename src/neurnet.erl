@@ -2,16 +2,14 @@
 %%% @author borja
 %%% @doc
 %%%
+%%% TODO: Un agente debe de estar formado por varias redes neuronales de control y la superior
+%%% TODO: Añadir metodo de ajuste de pesos mediante estimulos positivos/negativos
+%%% TODO: Debe de haber una population id "Real" que siempre existe, si no se especifica el pop_id, el agente se refiere ahu
 %%% @end
 %%%-------------------------------------------------------------------
 -module(neurnet).
 -author("borja").
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
-
-%%% TODO -------------------------------------------------------------
-% TODO: Un agente debe de estar formado por varias redes neuronales de control y la superior
-% TODO: Añadir metodo de ajuste de pesos mediante estimulos positivos/negativos
-% TODO: Debe de haber una population id "Real" que siempre existe, si no se especifica el pop_id, el agente se refiere ahu
 
 -include_lib("kernel/include/logger.hrl").
 -include_lib("elements.hrl").
@@ -24,11 +22,7 @@
 -define(MAX_ATTEMPTS, 20).
 -define(FITNESS_TARGET, infinity).
 -define(ARCHITECTURE(Layers), enn:sequential(Layers)).
--define(NEURNET_TABLES_ATTRIBUTES_LIST,
-    [
-        {sensor, record_info(fields, sensor)},
-        {actuator, record_info(fields, actuator)}
-    ]).
+
 
 %%%===================================================================
 %%% API
@@ -45,17 +39,7 @@ attributes_table() ->
     eevo:attributes_table() ++ enn:attributes_table() ++ [
         {cortex, genotype:fields(actuator)},
         {neuron, genotype:fields(sensor  )}
-    ],
-
-    .
-
-
-
-
-start_tables() ->
-    Tables = ?NEURNET_TABLES_ATTRIBUTES_LIST ++
-             ,
-    
+    ].
 
 %%--------------------------------------------------------------------
 %% @doc
