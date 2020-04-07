@@ -35,18 +35,27 @@
 %%%===================================================================
 
 %%--------------------------------------------------------------------
-%% @doc
-%%
-%%
+%% @doc Returns a list of tuples with the record name and attributes
+%% list. This is mainly used to prepare the tables in mnesia.
 %% @end
 %%--------------------------------------------------------------------
-%TODO: Correct specs
+-spec attributes_table() -> 
+    [{Elem :: nnelements:element(), [Attr :: atom()]}].
+attributes_table() ->
+    eevo:attributes_table() ++ enn:attributes_table() ++ [
+        {cortex, genotype:fields(actuator)},
+        {neuron, genotype:fields(sensor  )}
+    ],
+
+    .
+
+
+
+
 start_tables() ->
     Tables = ?NEURNET_TABLES_ATTRIBUTES_LIST ++
-             eevo:attributes_table() ++
-             enn:attributes_table(),
-    nndb:create_tables(Tables),
-    nndb:start(Tables).
+             ,
+    
 
 %%--------------------------------------------------------------------
 %% @doc

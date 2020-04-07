@@ -14,7 +14,9 @@
 %%====================================================================
 
 start(_StartType, StartArgs) ->
-    neurnet:start_tables(),
+    Tables = neurnet:attributes_table(),
+    edb:create_tables(Tables),
+    edb:start(Tables),
     neurnet_sup:start_link(StartArgs).
 
 %%--------------------------------------------------------------------
