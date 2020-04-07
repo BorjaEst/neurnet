@@ -4,7 +4,7 @@
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
--module(nn_agent).
+-module(brain).
 -compile([export_all, nowarn_export_all]). %% TODO: To delete after build
 
 -include_lib("kernel/include/logger.hrl").
