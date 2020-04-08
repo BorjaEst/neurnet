@@ -1,26 +1,15 @@
 %%%-------------------------------------------------------------------
 %%% @author borja
-%%% @copyright (C) 2019, <COMPANY>
 %%% @doc
 %%%
 %%% @end
-%%% Created : 17. Feb 2019 11:56
 %%%-------------------------------------------------------------------
 -module(test_algorithms).
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
--include_lib("neurnet.hrl").
-
 %% Defined agent species
 -export([]).
 
--ifdef(debug_mode).
--define(LOG(X), io:format("{~p,~p,~p}: ~p~n", [self(), ?MODULE, ?LINE, X])).
--define(STDCALL_TIMEOUT, infinity).
--else.
--define(LOG(X), true).
--define(STDCALL_TIMEOUT, 5000).
--endif.
 
 %%%===================================================================
 %%% Defined Actuators
