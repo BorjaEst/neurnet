@@ -23,12 +23,19 @@
 %%%===================================================================
 
 %%--------------------------------------------------------------------
-%% @doc Returns a list of tuples with the record name and attributes
-%% list. This is mainly used to prepare the tables in mnesia.
+%% Function: groups() -> [Group]
+%% Group = {GroupName, [ActuatorName :: atom()]}
+%%-------------------------------------------------------------------
+groups() -> 
+    [
+        {bool_input, [seq_1, seq_2]}
+    ].
+
+
+%%--------------------------------------------------------------------
+%% @doc Returns a boolean in an specific sequence.
 %% @end
 %%-------------------------------------------------------------------
-seq_1() -> [logical_gate].
-
 -spec seq_1(State :: term()) -> Result when
     Result :: {  ok, Signal :: number(), NewState :: term()} |
               {stop, Reason :: string(), NewState :: term()}.
@@ -40,14 +47,10 @@ seq_1(#{seq_1:=[]} = State) ->
 seq_1(#{} = State) -> 
     seq_1(State#{seq_1=>?XOR_TEST_SEQ1}).
 
-
 %%--------------------------------------------------------------------
-%% @doc Returns a list of tuples with the record name and attributes
-%% list. This is mainly used to prepare the tables in mnesia.
+%% @doc Returns a boolean in an specific sequence.
 %% @end
 %%------------------------------------------------------------------
-seq_2() -> [logical_gate].
-
 -spec seq_2(State :: term()) -> Result when
     Result :: {  ok, Signal :: number(), NewState :: term()} |
               {stop, Reason :: string(), NewState :: term()}.

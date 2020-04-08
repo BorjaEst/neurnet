@@ -22,22 +22,35 @@
 %%%===================================================================
 
 %%--------------------------------------------------------------------
-%% Function: all() -> [ActuatorCall :: atom()]
+%% Function: groups() -> [Group]
+%% Group = {GroupName, [ActuatorName :: atom()]}
 %%-------------------------------------------------------------------
-all() -> [xor_score].
+groups() -> 
+    [
+        {gate_score,   [xor_score]},
+        {gate_or_null, [xor_score, null]}
+    ].
 
 
 %%--------------------------------------------------------------------
 %% @doc Scores and agent according to the xor error. Backpropagation.
 %% @end
 %%--------------------------------------------------------------------
-xor_score() -> [logical_gate].
-
 -spec xor_score(Signal :: float(), State :: term()) -> 
     {ok, Score :: float(), Error :: float(), NewState :: term()}.
 xor_score(Signal, #{bool_in:=[I1,I2]} = State) -> 
     Error = Signal - num_xor(I1, I2),
     {ok, Error, score(Error), State#{bool_in:=[]}}.
+
+
+%%--------------------------------------------------------------------
+%% @doc This does nothing (to deactivate actuator).
+%% @end
+%%--------------------------------------------------------------------
+-spec null(Signal :: float(), State :: term()) -> 
+    {ok, State :: term()}.
+null(_Signal, State) -> 
+    {ok, State}.
 
 
 %%====================================================================

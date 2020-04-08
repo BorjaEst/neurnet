@@ -11,8 +11,10 @@
 -include_lib("common_test/include/ct.hrl").
 -include_lib("neurnet.hrl").
 
--define(INFO(Info), ct:log(?LOW_IMPORTANCE, "Info report: ~p", [Info])).
--define(ERROR(Error), ct:pal(?HI_IMPORTANCE, "Error report: ~p", [Error])).
+-define( INFO( Info),  
+        ct:log(?LOW_IMPORTANCE,  "Info report: ~p", [ Info])).
+-define(ERROR(Error), 
+        ct:pal( ?HI_IMPORTANCE, "Error report: ~p", [Error])).
 
 -define(PARALLEL_TRAININGS, 4).
 
@@ -109,9 +111,8 @@ groups() ->
 %%--------------------------------------------------------------------
 all() ->
     [
-        go_sum,
-        go_xor
-%%        {group, test_for_multiple_trainings}
+%%        {group, test_for_multiple_trainings},
+       xor_challenge 
     ].
 
 %%--------------------------------------------------------------------
@@ -136,43 +137,30 @@ my_test_case_example(_Config) ->
 % TESTS --------------------------------------------------------------
 
 % ....................................................................
-go_sum() ->
+xor_challenge() ->
     [].
-go_sum(_Config) ->
-    {Score, Best_Agent_Id} = neurnet:go(
-        _Morphology = test_morphologies:sum_mimic(),
-        _InitialLayerDensities = [?dense(2, #{activation => tanh})],
-        _MaxTime = infinity,        % Optional
-        _MaxAttempts = infinity,    % Optional
-        _FitnessTarget = 99.9       % Optional
+xor_challenge(_Config) ->
+    Results = neurnet:go(
+        _Genotypes = [test_genotypes:complex_gate()],
+        _Options   = [{stoptime, 2000},{target, 7800.0}]
     ),
-    print_results(Score, Best_Agent_Id).
+    print(Results).
 
-% ....................................................................
-go_xor() ->
-    [].
-go_xor(_Config) ->
-    {Score, Best_Agent_Id} = neurnet:go(
-        _Morphology = test_morphologies:xor_mimic(),
-        _InitialLayerDensities = [?dense(2, #{activation => tanh})],
-        _MaxTime = infinity,        % Optional
-        _MaxAttempts = infinity,    % Optional
-        _FitnessTarget = 99.9       % Optional
-    ),
-    print_results(Score, Best_Agent_Id).
 
 % --------------------------------------------------------------------
 % SPECIFIC HELPER FUNCTIONS --------------------------------------------------------------------------------------------
 
+print(Results) ->
+    ct:print(["Neurnet report: \n"|format_results(Results, 1)]).
 
-print_results(Score, Best_Agent_Id) ->
-    Agent = edb:read(Best_Agent_Id),
-    Cortex = edb:read(?cortex_id(Agent#agent.properties)),
-    ct:log(?LOW_IMPORTANCE, "Best agent score: ~p", [Score]),
-    ct:log(?LOW_IMPORTANCE, "Best agent body: ~p", [Agent]),
-    ct:log(?LOW_IMPORTANCE, "Best agent cortex: ~p", [Cortex]),
-    [print_layout(Layer, Neurons_Ids) || {Layer, Neurons_Ids} <- maps:to_list(Cortex#cortex.layers)].
-
-print_layout(Layer, Neurons_Ids) ->
-    ct:log(?LOW_IMPORTANCE, "Best agent layer ~p: ~p", [Layer, [edb:read(Neuron_Id) || Neuron_Id <- Neurons_Ids]]).
+format_results([{Score, Agent_Id} | Results], N) ->
+    Agent   = edb:read(Best_Agent_Id),
+    Network = edb:read(?network(Agent)),
+    [io_lib:format("Results network ~p\n",          [      N]),
+     io_lib:format("\tBest agent score:\t~p\n",     [  Score]),
+     io_lib:format("\tBest agent arguments:\t~p\n", [  Agent]),
+     io_lib:format("\tBest agent network:\t~p\n",   [Network]) |
+        format_results(Results, N+1)].
+format_results([], N) ->
+    "Report end -----------\n".
 

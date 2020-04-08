@@ -4,7 +4,7 @@
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
--module(test_algorithms).
+-module(test_architectures).
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
 %% Defined agent species
@@ -54,10 +54,11 @@ change_architecture() ->
 
 % ....................................................................
 % TODO: Define specs and comments
-complex_architecture() ->
+complex() ->
     _Mutation_algorithm = #{
-        allow_recurrent_links   => true,                        % Recurrent links available
-        available_af            => [{sigmoid, 2}, {tanh, 1}],    % [{function_name, function_weight}]
+        initial_layers          => [?dense(3), ?dense(3)],
+        model_type              => recurrent,                   % Recurrent links available
+        available_af            => [{sigmoid, 2}, {tanh, 1}],   % [{function_name, function_weight}]
         available_aggrf         => [{dotprod, 1}],              % [{function_name, function_weight}]
         remove_neurons          => 0.05,                        % %_ofMaxNetwork reduction
         create_neurons          => 0.10,                        % %_ofMaxNetwork extension
