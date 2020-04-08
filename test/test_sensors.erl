@@ -1,61 +1,66 @@
 %%%-------------------------------------------------------------------
 %%% @author borja
-%%% @copyright (C) 2019, <COMPANY>
 %%% @doc
 %%%
+%%% A sensor must return one of the following values:
+%%% @spec actuator_name(State) ->
+%%%                     {  ok, Signal, NextState} |
+%%%                     {stop, Reason, NextState} 
 %%% @end
-%%% Created : 17. Feb 2019 11:56
 %%%-------------------------------------------------------------------
 -module(test_sensors).
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
--include_lib("neurnet.hrl").
-
 %% Defined agent species
 -export([]).
 
--define(VAL_TEST_SIGNAL, 0.2).
--define(XOR_TEST_SEQ1, [-1, 1, -1, 1]).
--define(XOR_TEST_SEQ2, [-1, -1, 1, 1]).
+-define(XOR_TEST_SEQ1, [-1, +1, -1, +1]).
+-define(XOR_TEST_SEQ2, [-1, -1, +1, +1]).
 
--ifdef(debug_mode).
--define(STDCALL_TIMEOUT, infinity).
--else.
--define(STDCALL_TIMEOUT, 5000).
--endif.
 
 %%%===================================================================
 %%% Defined Sensors
 %%%===================================================================
 
-% ....................................................................
-% TODO: Define specs and comments
-val_sns(#{values := Values} = Properties) ->
-    Signal = ?VAL_TEST_SIGNAL,
-    {Signal, Properties#{
-        values := [Signal | Values]
-    }};
-val_sns(#{} = Properties) ->
-    val_sns(Properties#{
-        values => []
-    }).
+%%--------------------------------------------------------------------
+%% @doc Returns a list of tuples with the record name and attributes
+%% list. This is mainly used to prepare the tables in mnesia.
+%% @end
+%%-------------------------------------------------------------------
+seq_1() -> [logical_gate].
 
-% ....................................................................
-% TODO: Define specs and comments
-xor_sns1(#{xor_1 := [Signal | _]} = Properties) ->
-    {Signal, Properties};
-xor_sns1(#{} = Properties) ->
-    Inputs = [Signal | _] = ?XOR_TEST_SEQ1,
-    {Signal, Properties#{
-        xor_1 => Inputs
-    }}.
+-spec seq_1(State :: term()) -> Result when
+    Result :: {  ok, Signal :: number(), NewState :: term()} |
+              {stop, Reason :: string(), NewState :: term()}.
+seq_1(#{seq_1:=[Signal|Sx]} = State) -> 
+    In = [Signal|maps:get(in, State, [])],
+    {ok, Signal, State#{in=>In,seq_1:=Sx}};
+seq_1(#{seq_1:=[]} = State) -> 
+    {stop, "end of training", State};
+seq_1(#{} = State) -> 
+    seq_1(State#{seq_1=>?XOR_TEST_SEQ1}).
 
-xor_sns2(#{xor_2 := [Signal | _]} = Properties) ->
-    {Signal, Properties};
-xor_sns2(#{} = Properties) ->
-    Inputs = [Signal | _] = ?XOR_TEST_SEQ2,
-    {Signal, Properties#{
-        xor_2 => Inputs
-    }}.
 
+%%--------------------------------------------------------------------
+%% @doc Returns a list of tuples with the record name and attributes
+%% list. This is mainly used to prepare the tables in mnesia.
+%% @end
+%%------------------------------------------------------------------
+seq_2() -> [logical_gate].
+
+-spec seq_2(State :: term()) -> Result when
+    Result :: {  ok, Signal :: number(), NewState :: term()} |
+              {stop, Reason :: string(), NewState :: term()}.
+seq_2(#{seq_2:=[Signal|Sx]} = State) -> 
+    In = [Signal|maps:get(in, State, [])],
+    {ok, Signal, State#{in=>In,seq_2:=Sx}};
+seq_2(#{seq_2:=[]} = State) -> 
+    {stop, "end of training", State};
+seq_2(#{} = State) -> 
+    seq_2(State#{seq_2=>?XOR_TEST_SEQ2}).
+
+
+%%====================================================================
+%% Internal functions
+%%====================================================================
 
