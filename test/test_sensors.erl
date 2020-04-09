@@ -33,10 +33,12 @@ groups() ->
     ].
 
 
-%%--------------------------------------------------------------------
+%%-------------------------------------------------------------------
 %% @doc Returns a boolean in an specific sequence.
 %% @end
 %%-------------------------------------------------------------------
+seq_1() -> [].
+
 -spec seq_1(State :: term()) -> Result when
     Result :: {  ok, Signal :: number(), NewState :: term()} |
               {stop, Reason :: string(), NewState :: term()}.
@@ -48,10 +50,12 @@ seq_1(#{seq_1:=[]} = State) ->
 seq_1(#{} = State) -> 
     seq_1(State#{seq_1=>?XOR_TEST_SEQ1}).
 
-%%--------------------------------------------------------------------
+%%-------------------------------------------------------------------
 %% @doc Returns a boolean in an specific sequence.
 %% @end
-%%------------------------------------------------------------------
+%%-------------------------------------------------------------------
+seq_2() -> [].
+
 -spec seq_2(State :: term()) -> Result when
     Result :: {  ok, Signal :: number(), NewState :: term()} |
               {stop, Reason :: string(), NewState :: term()}.

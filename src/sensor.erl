@@ -7,7 +7,7 @@
 -module(sensor).
 
 %% API
--export([fields/1, load/1]).
+-export([fields/1, load/1, run/2, mutate/1]).
 -export_type([id/0, group_id/0, sensor/0, group/0]).
 
 -define(SENSOR_ID(Name), {Name,       sensor}).
@@ -22,8 +22,8 @@
 
 -type group_id() :: {Name :: atom(), sensor_group}.
 -record(group, {
-    id        :: id(),
-    sensors :: {Module :: module(), Name :: atom()}
+    id        :: group_id(),
+    sensors :: [Sensor_id :: id()]
 }).
 -type group() :: #group{}.
 
@@ -49,6 +49,34 @@ load(Modules) ->
     Sets = set_modules(Modules, sets:new()), 
     edb:write(sets:to_list(Sets)),
     ok.
+
+%%--------------------------------------------------------------------
+%% @doc Runs the specified sensor. 
+%% @end
+%%-------------------------------------------------------------------
+-spec run(Sensor, State) -> SensorResult when 
+    Sensor :: sensor(),
+    State  :: #{Field :: term() => Value :: term()},
+    SensorResult :: {  ok, Signal, NextState} |
+                    {stop, Reason, NextState},
+    Signal    :: number(),
+    Reason    :: term(),
+    NextState :: #{Field :: term() => Value :: term()}.
+run(Sensor, State) -> 
+    {Module, Name} = Sensor#sensor.function,
+    Module:Name(State).
+
+%%--------------------------------------------------------------------
+%% @doc Loads the sensors from the indicated modules. 
+%% @end
+%%-------------------------------------------------------------------
+-spec mutate(Sensor :: sensor()) -> NewSensor_id :: id().
+mutate(Sensor) -> 
+    {Module, Name} = Sensor#sensor.function,
+    Possible_new = Module:Name(),
+    Sensor#sensor{
+        function = {Module, ltools:randnth(Possible_new)}
+    }.
 
 
 %%%===================================================================
