@@ -70,6 +70,7 @@ new_from(Id) ->
 controller(Phenotype_Id) -> 
     Phenotype = edb:read(Phenotype_Id),
     enn:start(Phenotype#phenotype.network),
+    enn:link_network(Phenotype#phenotype.network),
     State = #{
         cortex    => enn:cortex_pid(Phenotype#phenotype.network),
         actuators => edb:read(Phenotype#phenotype.actuators),
