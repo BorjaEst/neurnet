@@ -36,6 +36,8 @@ groups() ->
 %% @doc Scores and agent according to the xor error. Backpropagation.
 %% @end
 %%--------------------------------------------------------------------
+xor_score(mutations) -> [].
+
 -spec xor_score(Signal :: float(), State :: term()) -> 
     {ok, Score :: float(), Error :: float(), NewState :: term()}.
 xor_score(Signal, #{bool_in:=[I1,I2]} = State) -> 
@@ -46,6 +48,8 @@ xor_score(Signal, #{bool_in:=[I1,I2]} = State) ->
 %% @doc This does nothing (to deactivate actuator).
 %% @end
 %%--------------------------------------------------------------------
+null(mutations) -> [xor_score].
+
 -spec null(Signal :: float(), State :: term()) -> 
     {ok, State :: term()}.
 null(_Signal, State) -> 

@@ -7,7 +7,7 @@
 -module(actuator).
 
 %% API
--export([fields/1, load/1]).
+-export([fields/1, load/1, run/3, mutate/1]).
 -export_type([id/0, group_id/0, actuator/0, group/0]).
 
 -define(ACTUATOR_ID(Name), {Name,       actuator}).
@@ -22,8 +22,8 @@
 
 -type group_id() :: {Name :: atom(), actuator_group}.
 -record(group, {
-    id        :: id(),
-    actuators :: {Module :: module(), Name :: atom()}
+    id        :: group_id(),
+    actuators :: [Actuator_id :: id()]
 }).
 -type group() :: #group{}.
 
@@ -49,6 +49,38 @@ load(Modules) ->
     Sets = set_modules(Modules, sets:new()), 
     edb:write(sets:to_list(Sets)),
     ok.
+
+%%--------------------------------------------------------------------
+%% @doc Runs the specified actuator. 
+%% @end
+%%-------------------------------------------------------------------
+-spec run(Actuator, Input, State) -> ActuatorResult when 
+    Actuator :: actuator(),
+    Input    :: float(),
+    State    :: #{Field :: term() => Value :: term()},
+    ActuatorResult :: {  ok,                NextState} |
+                      {  ok,  Error, Score, NextState} |
+                      {stop, Reason,        NextState} |
+                      {stop, Reason, Score, NextState},
+    Error     :: number(),
+    Score     :: number(),
+    Reason    :: term(),
+    NextState :: #{Field :: term() => Value :: term()}.
+run(Actuator, Input, State) -> 
+    {Module, Name} = Actuator#actuator.function,
+    Module:Name(Input, State).
+
+%%--------------------------------------------------------------------
+%% @doc Loads the actuators from the indicated modules. 
+%% @end
+%%-------------------------------------------------------------------
+-spec mutate(Actuator :: actuator()) -> NewActuator_id :: id().
+mutate(Actuator) -> 
+    {Module, Name} = Actuator#actuator.function,
+    Possible_new = Module:Name(),
+    Actuator#actuator{
+        function = {Module, ltools:randnth(Possible_new)}
+    }.
 
 
 %%%===================================================================
