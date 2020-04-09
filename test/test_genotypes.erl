@@ -18,7 +18,7 @@
 architectures() -> [test_architectures].
 actuators()     -> [test_actuators].
 sensors()       -> [test_sensors].
-
+genotypes()     -> [dummy_gate, complex_gate].
 
 %%%===================================================================
 %%% Defined genotypes 
@@ -27,7 +27,7 @@ sensors()       -> [test_sensors].
 % ....................................................................
 % TODO: Define specs and comments
 dummy_gate() ->
-    #{   
+    _Genotype = #{   
         architecture => simple,
         actuators    => [gate_or_null],
         sensors      => [bool_input1, bool_input2]
@@ -36,7 +36,7 @@ dummy_gate() ->
 % ....................................................................
 % TODO: Define specs and comments
 complex_gate() ->
-    #{   
+    _Genotype = #{   
         architecture => complex,
         actuators    => [gate_score],
         sensors      => [bool_input1, bool_input2]
