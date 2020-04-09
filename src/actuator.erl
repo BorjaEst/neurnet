@@ -7,19 +7,20 @@
 -module(actuator).
 
 %% API
--export([load/1]).
--export_type([id/0, actuator/0, group/0]).
+-export([fields/1, load/1]).
+-export_type([id/0, group_id/0, actuator/0, group/0]).
 
--type id() :: {Name :: atom(), Type :: actuator | group}.
 -define(ACTUATOR_ID(Name), {Name,       actuator}).
 -define(   GROUP_ID(Name), {Name, actuator_group}).
 
+-type id() :: {Name :: atom(), Type :: actuator}.
 -record(actuator, {
     id       :: id(),
     function :: {Module :: module(), Name :: atom()}
 }).
 -type actuator() :: #actuator{}.
 
+-type group_id() :: {Name :: atom(), actuator_group}.
 -record(group, {
     id        :: id(),
     actuators :: {Module :: module(), Name :: atom()}
@@ -27,10 +28,17 @@
 -type group() :: #group{}.
 
 
-
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc Returns the record fields of an element.
+%% @end
+%%--------------------------------------------------------------------
+-spec fields(Atom :: actuator | group) -> ListOfFields :: [atom()].
+fields(actuator) -> record_info(fields, actuator);
+fields(group)    -> record_info(fields, group).
 
 %%--------------------------------------------------------------------
 %% @doc Loads the actuators from the indicated modules. 

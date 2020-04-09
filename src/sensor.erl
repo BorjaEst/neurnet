@@ -7,21 +7,22 @@
 -module(sensor).
 
 %% API
--export([load/1]).
--export_type([id/0, sensor/0, group/0]).
+-export([fields/1, load/1]).
+-export_type([id/0, group_id/0, sensor/0, group/0]).
 
--type id() :: {Name :: atom(), Type :: sensor | group}.
 -define(SENSOR_ID(Name), {Name,       sensor}).
--define( GROUP_ID(Name), {Name, sensor_group}).
+-define(   GROUP_ID(Name), {Name, sensor_group}).
 
+-type id() :: {Name :: atom(), Type :: sensor}.
 -record(sensor, {
     id       :: id(),
     function :: {Module :: module(), Name :: atom()}
 }).
 -type sensor() :: #sensor{}.
 
+-type group_id() :: {Name :: atom(), sensor_group}.
 -record(group, {
-    id      :: id(),
+    id        :: id(),
     sensors :: {Module :: module(), Name :: atom()}
 }).
 -type group() :: #group{}.
@@ -30,6 +31,14 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc Returns the record fields of an element.
+%% @end
+%%--------------------------------------------------------------------
+-spec fields(Atom :: sensor | group) -> ListOfFields :: [atom()].
+fields(sensor) -> record_info(fields, sensor);
+fields(group)  -> record_info(fields, group).
 
 %%--------------------------------------------------------------------
 %% @doc Loads the sensors from the indicated modules. 
