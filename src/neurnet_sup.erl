@@ -37,8 +37,8 @@
     modules  => [gen_server]}).
 
 -record(childSpecs, {
-    eevo_sup = ?SPECS_EEVO_SUP([]),
-    enn_sup = ?SPECS_ENN_SUP([]),
+    eevo_sup    = ?SPECS_EEVO_SUP(   []),
+    enn_sup     = ?SPECS_ENN_SUP(    []),
     neurnet_srv = ?SPECS_NEURNET_SRV([])
 }).
 
@@ -69,11 +69,17 @@ init(StartArgs) ->
     do_init(StartArgs, #childSpecs{}).
 
 do_init([{eevo_config, Config} | StartArgs], ChildSpecs) ->
-    do_init(StartArgs, ChildSpecs#childSpecs{eevo_sup = ?SPECS_EEVO_SUP(Config)});
+    do_init(StartArgs, ChildSpecs#childSpecs{
+        eevo_sup = ?SPECS_EEVO_SUP(Config)
+    });
 do_init([{enn_config, Config} | StartArgs], ChildSpecs) ->
-    do_init(StartArgs, ChildSpecs#childSpecs{enn_sup = ?SPECS_ENN_SUP(Config)});
+    do_init(StartArgs, ChildSpecs#childSpecs{
+        enn_sup = ?SPECS_ENN_SUP(Config)
+    });
 do_init([{neurnet_config, Config} | StartArgs], ChildSpecs) ->
-    do_init(StartArgs, ChildSpecs#childSpecs{neurnet_srv = ?SPECS_NEURNET_SRV(Config)});
+    do_init(StartArgs, ChildSpecs#childSpecs{
+        neurnet_srv = ?SPECS_NEURNET_SRV(Config)
+    });
 do_init([], ChildSpecs) ->
     {ok, {?SUP_FLAGS, [
         ChildSpecs#childSpecs.eevo_sup,
