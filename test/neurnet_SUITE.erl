@@ -33,6 +33,7 @@ suite() ->
 %%--------------------------------------------------------------------
 init_per_suite(Config) ->
     application:start(neurnet),
+    neurnet:genotypes([test_genotypes]),
     Config.
 
 %%--------------------------------------------------------------------
@@ -141,8 +142,8 @@ xor_challenge() ->
     [].
 xor_challenge(_Config) ->
     Results = neurnet:go(
-        _Genotypes = [test_genotypes:complex_gate()],
-        _Options   = [{stoptime, 2000},{target, 7800.0}]
+        _Genotypes = [complex_gate],
+        _Options   = #{stoptime => 2000, target => 7800.0}]
     ),
     print(Results).
 

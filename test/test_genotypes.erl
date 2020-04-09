@@ -12,25 +12,32 @@
 
 
 %%%===================================================================
-%%% Defined architectures 
+%%% Modules to load 
 %%%===================================================================
 
+architectures() -> [test_architectures].
+actuators()     -> [test_actuators].
+sensors()       -> [test_sensors].
+
+
+%%%===================================================================
+%%% Defined genotypes 
+%%%===================================================================
 
 % ....................................................................
 % TODO: Define specs and comments
 dummy_gate() ->
     #{   
-        architecture => test_architectures:simple_edit_weights(),
+        architecture => simple_edit_weights,
         actuators    => [gate_or_null],
         sensors      => [bool_input, bool_input]
     }.
-
 
 % ....................................................................
 % TODO: Define specs and comments
 complex_gate() ->
     #{   
-        architecture => test_architectures:complex(),
+        architecture => complex,
         actuators    => [gate_score],
         sensors      => [bool_input, bool_input]
     }.
