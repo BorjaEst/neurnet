@@ -8,7 +8,7 @@
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
 %% API
--export([load/1]).
+-export([fields/1, load/1]).
 -export_type([id/0, architecture/0]).
 
 -type id() :: {Name :: atom(), architecture}.
@@ -29,7 +29,14 @@
 %%% API
 %%%===================================================================
 
-%%--------------------------------------------------------------------
+%%-------------------------------------------------------------------
+%% @doc Returns the record fields of an element.
+%% @end
+%%-------------------------------------------------------------------
+-spec fields(Atom :: architecture) -> ListOfFields :: [atom()].
+fields(architecture) -> record_info(fields, architecture).
+
+%%-------------------------------------------------------------------
 %% @doc Loads the architectures from the indicated modules. 
 %% @end
 %%-------------------------------------------------------------------
@@ -38,6 +45,18 @@ load(Modules) ->
     Sets = set_modules(Modules, sets:new()), 
     edb:write(sets:to_list(Sets)),
     ok. 
+
+%%-------------------------------------------------------------------
+%% @doc Generates a network id from a defined architecture. 
+%% @end
+%%-------------------------------------------------------------------
+-spec new_network(Architecture :: architecture()) -> 
+    Network_id :: enn:id().
+new_network(A) -> 
+    Nature = A#architecture.type,
+    enn:compile(
+        model:Nature([layer:dense(N) || N <- A#architecture.dim])
+    ).
 
 
 %%====================================================================
