@@ -12,7 +12,7 @@
 
 
 %%%===================================================================
-%%% Modules to load 
+%%% Modules to preload 
 %%%===================================================================
 
 architectures() -> [test_architectures].
@@ -28,9 +28,9 @@ sensors()       -> [test_sensors].
 % TODO: Define specs and comments
 dummy_gate() ->
     #{   
-        architecture => simple_edit_weights,
+        architecture => simple,
         actuators    => [gate_or_null],
-        sensors      => [bool_input, bool_input]
+        sensors      => [bool_input1, bool_input2]
     }.
 
 % ....................................................................
@@ -39,5 +39,5 @@ complex_gate() ->
     #{   
         architecture => complex,
         actuators    => [gate_score],
-        sensors      => [bool_input, bool_input]
+        sensors      => [bool_input1, bool_input2]
     }.
