@@ -1,14 +1,15 @@
 %%%-------------------------------------------------------------------
 %%% @author borja
-%%% @doc
-%%%
+%%% @doc Phenotype is the physical espresion of the genotype. This 
+%%% exacly defines all the features of the entity. This module 
+%%% includes the funtions to generate, mutate and run phenotypes.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(phenotype).
 -compile([export_all, nowarn_export_all]). %% TODO: To delete after build
 
 %% API
--export([]).
+-export([fields/1, new_from/1, mutator/1, controller/1]).
 -export_type([id/0, phenotype/0]).
 
 -type id() :: {Reference :: reference(), phenotype}.
@@ -21,7 +22,6 @@
     sensors      :: [  sensor:id()]
 }).
 -type phenotype() :: #phenotype{}.
-
 
 -define(   CORTEX(State), maps:get(   cortex, State)).
 -define(ACTUATORS(State), maps:get(actuators, State)).
@@ -45,7 +45,7 @@ fields(phenotype) -> record_info(fields, phenotype).
 %%--------------------------------------------------------------------
 -spec new_from(Genotype :: genotype:id()) -> id().
 new_from(Id) -> 
-    Genotype     = edb:read(Id),
+    Genotype = edb:read(Id),
     Architecture = genotype:architecture(Genotype),
     AGroups      = genotype:actuator_groups(Genotype),
     SGroups      = genotype:sensor_groups(Genotype),
@@ -57,6 +57,21 @@ new_from(Id) ->
     },
     edb:write(Phenotype),
     Phenotype#phenotype.id.
+
+
+%%--------------------------------------------------------------------
+%% @doc Returns the id of a mutated phenotype.
+%% @end
+%%--------------------------------------------------------------------
+mutator(Id) -> 
+    P = edb:read(Id),
+    Mutated = P#phenotype{
+        network   = architecture:mutate(P#phenotype.network),
+        actuators = [actuator:mutate(A) || A<-P#phenotype.actuators],
+        sensors   = [  sensor:mutate(S) || S<-P#phenotype.sensors  ]
+    },
+    edb:write(Mutated),
+    Mutated#phenotype.id.
 
 
 %%%===================================================================
@@ -101,7 +116,7 @@ enter_fit(Errors, State) ->
 %% @end
 %%-------------------------------------------------------------------
 run_sensors(Signals, [Sensor|Sx], State) ->
-    case Sensor(State) of 
+    case sensors:run(Sensor, State) of 
         {  ok, Signal, NextState} -> 
             run_sensors([Signal | Signals], Sx, NextState);
         {stop, Reason, NextState} -> 
@@ -115,7 +130,7 @@ run_sensors(Signals, [], State) ->
 %% @end
 %%-------------------------------------------------------------------
 run_actuators(Errors, [Prediction|Px], [Actuator|Ax], State) ->
-    case Actuator(Prediction, State) of 
+    case actuator:run(Actuator, Prediction, State) of 
          {  ok,                NextState} -> 
             run_actuators([  0.0|Errors], Px, Ax, NextState);
          {  ok,  Error, Score, NextState} -> 
