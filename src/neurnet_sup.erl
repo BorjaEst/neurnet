@@ -29,17 +29,10 @@
     restart  => permanent,
     type     => supervisor,
     modules  => [supervisor]}).
--define(SPECS_NEURNET_SRV(StartArgs), #{
-    id       => neurnet_srv,
-    start    => {neurnet_srv, start_link, [StartArgs]},
-    restart  => permanent,
-    shutdown => 1000,
-    modules  => [gen_server]}).
 
 -record(childSpecs, {
     eevo_sup    = ?SPECS_EEVO_SUP(   []),
-    enn_sup     = ?SPECS_ENN_SUP(    []),
-    neurnet_srv = ?SPECS_NEURNET_SRV([])
+    enn_sup     = ?SPECS_ENN_SUP(    [])
 }).
 
 
@@ -76,15 +69,10 @@ do_init([{enn_config, Config} | StartArgs], ChildSpecs) ->
     do_init(StartArgs, ChildSpecs#childSpecs{
         enn_sup = ?SPECS_ENN_SUP(Config)
     });
-do_init([{neurnet_config, Config} | StartArgs], ChildSpecs) ->
-    do_init(StartArgs, ChildSpecs#childSpecs{
-        neurnet_srv = ?SPECS_NEURNET_SRV(Config)
-    });
 do_init([], ChildSpecs) ->
     {ok, {?SUP_FLAGS, [
         ChildSpecs#childSpecs.eevo_sup,
-        ChildSpecs#childSpecs.enn_sup,
-        ChildSpecs#childSpecs.neurnet_srv
+        ChildSpecs#childSpecs.enn_sup
     ]}}.
 
 
