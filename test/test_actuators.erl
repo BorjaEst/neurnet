@@ -42,7 +42,6 @@ xor_score(Signal, #{bool_in:=[I1,I2]} = State) ->
     Error = Signal - num_xor(I1, I2),
     {ok, Error, score(Error), State#{bool_in:=[]}}.
 
-
 %%--------------------------------------------------------------------
 %% @doc This does nothing (to deactivate actuator).
 %% @end

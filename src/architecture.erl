@@ -1,32 +1,79 @@
 %%%-------------------------------------------------------------------
-%%% @copyright (C) 2018, <COMPANY>
+%%% @author borja
 %%% @doc
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
--module(algorithm).
+-module(architecture).
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
--include("neurnet.hrl").
--include_lib("eunit/include/eunit.hrl").
-
 %% API
-%%-export([]).
+-export([load/1]).
+-export_type([id/0, architecture/0]).
 
--ifdef(debug_mode).
--define(LOG(X), io:format("{~p,~p,~p}: ~p~n", [self(), ?MODULE, ?LINE, X])).
--define(LOG_S(X), io:format("{~p,~p,~p}: " ++ X ++ "~n", [self(), ?MODULE, ?LINE])).
--define(STDCALL_TIMEOUT, infinity).
--else.
--define(LOG(X), true).
--define(LOG_S(X), true).
--define(STDCALL_TIMEOUT, 5000).
--endif.
+-type id() :: {Name :: atom(), architecture}.
+-define(ARCHITECTURE_ID(Name), {Name, architecture}).
+
+-record(architecture, {
+    id   :: id(),
+    dim  :: [LayerSize :: integer()],
+    type :: model:nature()
+}).
+-type architecture() :: #architecture{}.
+
+-define(DEF_DIM,  [3]).
+-define(DEF_TYPE, recurrent).
+
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
+%%--------------------------------------------------------------------
+%% @doc Loads the architectures from the indicated modules. 
+%% @end
+%%-------------------------------------------------------------------
+-spec load(Modules :: [Module :: module()]) -> ok.
+load(Modules) -> 
+    Sets = set_modules(Modules, sets:new()), 
+    edb:write(sets:to_list(Sets)),
+    ok. 
+
+
+%%====================================================================
+%% Internal functions
+%%====================================================================
+
+% --------------------------------------------------------------------
+set_modules([Module | Modules], Sets) ->
+    set_modules(Modules,
+        add_architectures(Module:all(), Module, Sets));
+set_modules([], Sets) -> 
+    Sets.
+
+add_architectures([Name | Architectures], Module, Sets) -> 
+    Definition   = Module:Name(),
+    Architecture = #architecture{
+        id   = ?ARCHITECTURE_ID(Name), 
+        dim  = maps:get(initial_dimensions, Definition,  ?DEF_DIM),
+        type = maps:get(        model_type, Definition, ?DEF_TYPE)
+    },
+    add_architectures(Architectures, Module, 
+        sets:add_element(Architecture, Sets));
+add_architectures([], _, Sets) -> 
+    Sets.
+
+
+
+
+
+
+
+
+
+%%%===================================================================
+%%% API
+%%%===================================================================
 
 %%--------------------------------------------------------------------
 %% @doc

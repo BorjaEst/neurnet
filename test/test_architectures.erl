@@ -12,8 +12,49 @@
 
 
 %%%===================================================================
-%%% Defined Actuators
+%%% Defined Architectures
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% Function: all() -> [ArchitectureName :: atom()] 
+%%--------------------------------------------------------------------
+all() -> [simple, complex].
+
+
+%%--------------------------------------------------------------------
+%% @doc Simple architecture, only 1 initial layer and sequential.
+%% @end
+%%--------------------------------------------------------------------
+-spec simple() -> Architecture :: neurnet:architecture().
+simple() ->
+    _Architecture = #{
+        initial_dimensions => [2],
+        model_type         => sequential
+    }.
+
+%%--------------------------------------------------------------------
+%% @doc Complex architecture, 2 initial layer and allows recurrent 
+%% links.
+%% @end
+%%--------------------------------------------------------------------
+-spec complex() -> Architecture :: neurnet:architecture().
+complex() ->
+    _Architecture = #{
+        initial_dimensions => [3, 3],
+        model_type         => recurrent
+    }.
+
+
+
+
+
+
+
+
+
+
+
+
 
 % ....................................................................
 % TODO: Define specs and comments
@@ -54,7 +95,7 @@ change_architecture() ->
 
 % ....................................................................
 % TODO: Define specs and comments
-complex() ->
+complex_morphology() ->
     _Mutation_algorithm = #{
         initial_layers          => [?dense(3), ?dense(3)],
         model_type              => recurrent,                   % Recurrent links available
@@ -67,3 +108,7 @@ complex() ->
         change_to_random_aggrf  => 0.05,                        % %_OfHit on each neuron
         edit_random_bias        => 0.10                         % %_OfHit on each bias
     }.
+
+
+
+
