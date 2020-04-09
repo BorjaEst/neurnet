@@ -7,28 +7,72 @@
 -module(sensor).
 
 %% API
--export([]).
--export_type([id/0, sensor/0]).
+-export([load/1]).
+-export_type([id/0, sensor/0, group/0]).
 
--define(NEW_SENSOR_ID, {make_ref(), sensor}).
+-type id() :: {Name :: atom(), Type :: sensor | group}.
+-define(SENSOR_ID(Name), {Name,       sensor}).
+-define( GROUP_ID(Name), {Name, sensor_group}).
 
--type id() :: {Unique_Id :: reference(), sensor}.
 -record(sensor, {
-    id = ?NEW_SENSOR_ID :: id(),
-    name     :: atom() | string(),
+    id       :: id(),
     function :: {Module :: module(), Name :: atom()}
 }).
 -type sensor() :: #sensor{}.
+
+-record(group, {
+    id      :: id(),
+    sensors :: {Module :: module(), Name :: atom()}
+}).
+-type group() :: #group{}.
 
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
+%%--------------------------------------------------------------------
+%% @doc Loads the sensors from the indicated modules. 
+%% @end
+%%-------------------------------------------------------------------
+-spec load(Modules :: [Module :: module()]) -> ok.
+load(Modules) -> 
+    Sets = set_modules(Modules, sets:new()), 
+    edb:write(sets:to_list(Sets)),
+    ok.
+
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+% --------------------------------------------------------------------
+set_modules([Module | Modules], Sets) ->
+    set_modules(Modules,
+        add_groups(Module:groups(), Module, Sets));
+set_modules([], Sets) -> 
+    Sets.
+
+add_groups([{Name, Sensors} | Groups], Module, Sets) -> 
+    Group = #group{
+        id        = ?GROUP_ID(Name), 
+        sensors = [?SENSOR_ID(N) || N <-Sensors]
+    },
+    sets:add_element(Group, 
+            add_groups(Groups, Module, 
+                add_sensors(Sensors, Module, Sets)));
+add_groups([], _, Sets) -> 
+    Sets.
+
+add_sensors([Name | Sensors], Module, Sets) -> 
+    Sensor = #sensor{
+        id       = ?SENSOR_ID(Name),
+        function = {Module, Name}
+    },
+    add_sensors(Sensors, Module,
+        sets:add_element(Sensor, Sets));
+add_sensors([], _, Sets) -> 
+    Sets.
 
 
 %%====================================================================
