@@ -67,7 +67,7 @@ new_network(A) ->
     NewNetwork_id :: enn:id().
 mutate(Network_id) -> 
     Clone_Id = enn:clone(Network_id),
-    mutate_network(edb:read(Clone_Id)),
+    mutate_network(Clone_Id),
     Clone_Id.
 
 
@@ -85,22 +85,61 @@ mutate(Network_id) ->
 %% @end
 %%--------------------------------------------------------------------
 % TODO: Define spec
-mutate_network(Network) -> 
-    Rate    =  math:sqrt(elements:size(Network)),
+mutate_network(Network_id) -> 
+    Network       = edb:read(Network_id),
+    #{size:=Size} = enn:info(Network),
+    Rate = math:sqrt(Size),
     ?MAYBE(?NETWORK_EXTENSION) extend_network(Network, Rate),
     ?MAYBE(?NETWORK_REDUCTION) reduce_netkork(Network, Rate),
-    mutate_neurons(Network, Rate).
+    mutate_links(Network, Rate).
 
+% --------------------------------------------------------------------
 extend_network(Network, ExtRate) -> 
+    network:neurons
+
+
     transform:extend_network(elements:id(Network), ExtRate).
 
+
+
+% --------------------------------------------------------------------
 reduce_netkork(Network, RedRate) -> 
     transform:reduce_netkork(elements:id(Network), RedRate).
 
-mutate_neurons(Network, Rate) -> 
+mutate_links(Network, Rate) -> 
     Prob    = ?SIZE_CONSTANT/Rate,
     Neurons = ebd:read(ltools:rand(elements:neurons(Network), Prob)),
-    [mutate_neuron(Neuron) || Neuron <- Neurons].
+    [mutate_links(Neuron, Network) || Neuron <- Neurons].
+
+
+%%%===================================================================
+%%% Links transformations 
+%%%===================================================================
+
+% Definition of probabilities
+-define(LINKS_EXTENSION, 0.10).
+-define(LINKS_REDUCTION, 0.05).
+
+
+%%--------------------------------------------------------------------
+%% @doc Applies the mutations to the neuron links.
+%% @end
+%%--------------------------------------------------------------------
+% TODO: Define specs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %%%===================================================================
@@ -146,8 +185,8 @@ switch_bias(Neuron) ->
 mutate_weights(Neuron) -> 
     Inputs      = elemens:inputs_ids(Neuron),
     Probability = ?FANIN_CONSTANT/math:sqrt(length(Inputs)),
-    Selected_Weights = ltools:rand(Inputs, Probability),
-    transform:reset_weights(elements:id(Neuron), Selected_Weights).
+    Selected_From = ltools:rand(Inputs, Probability),
+    transform:reset_links(Selected_From, elements:id(Neuron)).
 
 
 %%====================================================================
@@ -172,6 +211,24 @@ add_architectures([Name | Architectures], Module, Sets) ->
         sets:add_element(Architecture, Sets));
 add_architectures([], _, Sets) -> 
     Sets.
+
+
+
+
+
+% --------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %%====================================================================
