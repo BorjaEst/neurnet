@@ -11,8 +11,6 @@
 -author("borja").
 -compile([export_all, nowarn_export_all]). %%TODO: To delete after build
 
--include_lib("neurnet.hrl").
-
 %% API
 -export([]).
 
@@ -54,17 +52,8 @@ load(GenotypeModules) ->
 %% the best phenotype for each specified genotype.
 %% @end
 %%--------------------------------------------------------------------
-%TODO: Correct specs
-go(Genotypes) -> go(Genotypes, #{}).
+%TODO: 
 
-%TODO: Correct specs
-go(Genotypes, Options) ->
-    Rules   = maps:merge(?DEFAULT_RULES, Options),
-    Threads = [pop_thread(Rules, Genotype) || Genotype <- Genotypes],
-    [eevo:score_and_champion(Id) || Id <- run_parallel(Threads)}].  
-
-pop_thread(Rules, Genotype) -> 
-    fun()-> eevo:start(Rules, [phenotype(Genotype)]) end.
 
 %%--------------------------------------------------------------------
 %% @doc 
@@ -83,19 +72,4 @@ phenotype(Genotype) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-
-% --------------------------------------------------------------------
-run_parallel(Functions) -> 
-    Pids = [spawn(request_result(self(), F)) || F <- Functions],
-    receive_results(Pids).
-
-request_result(Parent, Function) -> 
-    Parent ! {self, Function()}.
-
-receive_results([Pid | Pids]) -> 
-    receive {Pid, Result} -> [Result | receive_results(Pids)] end
-
-
-
-
 

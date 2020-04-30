@@ -65,128 +65,23 @@ new_network(A) ->
 %%-------------------------------------------------------------------
 -spec mutate(Network_id :: enn:id()) -> 
     NewNetwork_id :: enn:id().
-mutate(Network_id) -> 
-    Clone_Id = enn:clone(Network_id),
-    mutate_network(Clone_Id),
-    Clone_Id.
+mutate(_Network_id) -> 
+    error(undefined). % TODO
 
 
 %%%===================================================================
 %%% Network transformations 
 %%%===================================================================
 
-% Definition of probabilities
--define(NETWORK_EXTENSION, 0.10).
--define(NETWORK_REDUCTION, 0.05).
--define(SIZE_CONSTANT,     3.00).
-
-%%--------------------------------------------------------------------
-%% @doc Applies the mutations to the network.
-%% @end
-%%--------------------------------------------------------------------
-% TODO: Define spec
-mutate_network(Network_id) -> 
-    Network       = edb:read(Network_id),
-    #{size:=Size} = enn:info(Network),
-    Rate = math:sqrt(Size),
-    ?MAYBE(?NETWORK_EXTENSION) extend_network(Network, Rate),
-    ?MAYBE(?NETWORK_REDUCTION) reduce_netkork(Network, Rate),
-    mutate_links(Network, Rate).
-
-% --------------------------------------------------------------------
-extend_network(Network, ExtRate) -> 
-    network:neurons
-
-
-    transform:extend_network(elements:id(Network), ExtRate).
-
-
-
-% --------------------------------------------------------------------
-reduce_netkork(Network, RedRate) -> 
-    transform:reduce_netkork(elements:id(Network), RedRate).
-
-mutate_links(Network, Rate) -> 
-    Prob    = ?SIZE_CONSTANT/Rate,
-    Neurons = ebd:read(ltools:rand(elements:neurons(Network), Prob)),
-    [mutate_links(Neuron, Network) || Neuron <- Neurons].
-
 
 %%%===================================================================
 %%% Links transformations 
 %%%===================================================================
 
-% Definition of probabilities
--define(LINKS_EXTENSION, 0.10).
--define(LINKS_REDUCTION, 0.05).
-
-
-%%--------------------------------------------------------------------
-%% @doc Applies the mutations to the neuron links.
-%% @end
-%%--------------------------------------------------------------------
-% TODO: Define specs
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 %%%===================================================================
 %%% Neuron transformations 
 %%%===================================================================
-
-% Definition of probabilities
--define(LINKS_EXTENSION,      0.10).
--define(LINKS_REDUCTION,       0.05).
--define(ACTIVATION_CHANGE,    0.15).
--define(AGGREGATION_CHANGE,   0.15).
--define(BIAS_SWITCH,          0.10).
--define(FANIN_CONSTANT,       0.50). 
-
-%%--------------------------------------------------------------------
-%% @doc Applies the mutations to the neuron.
-%% @end
-%%--------------------------------------------------------------------
-% TODO: Define specs
-mutate_neuron(Neuron) -> 
-    Rate =  math:sqrt(length(elements:inputs_idps(Neuron))),
-    ?MAYBE(   ?LINKS_EXTENSION) links_extension(Neuron, Rate),
-    ?MAYBE(   ?LINKS_REDUCTION) links_reduction(Neuron, Rate),
-    % ?MAYBE( ?ACTIVATION_CHANGE) activation_change(Neuron),
-    % ?MAYBE(?AGGREGATION_CHANGE) aggregation_change(Neuron),
-    ?MAYBE(       ?BIAS_SWITCH) switch_bias(Neuron),
-    mutate_weights(Neuron).
-
-links_extension(Neuron, ExtRate) -> 
-    transform:extend_connections(elements:id(Neuron), ExtRate).
-
-links_reduction(Neuron, RedRate) -> 
-    transform:reduce_connections(elements:id(Neuron), RedRate).
-
-switch_bias(Neuron) -> 
-    Id = elements:id(Neuron),
-    transform:reset_bias(Id).
-    % case elements:bias(Neuron) of 
-    %     disabled -> transform:disable_bias(Id);
-    %     _        -> transform:reset_bias(Id)
-    % end.
-
-mutate_weights(Neuron) -> 
-    Inputs      = elemens:inputs_ids(Neuron),
-    Probability = ?FANIN_CONSTANT/math:sqrt(length(Inputs)),
-    Selected_From = ltools:rand(Inputs, Probability),
-    transform:reset_links(Selected_From, elements:id(Neuron)).
 
 
 %%====================================================================
@@ -211,24 +106,6 @@ add_architectures([Name | Architectures], Module, Sets) ->
         sets:add_element(Architecture, Sets));
 add_architectures([], _, Sets) -> 
     Sets.
-
-
-
-
-
-% --------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 %%====================================================================

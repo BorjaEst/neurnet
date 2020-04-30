@@ -90,60 +90,9 @@ map2(   actuators, Names) -> [actuator:id(Name) || Name <- Names];
 map2(     sensors, Names) -> [  sensor:id(Name) || Name <- Names].
 
 
-
-
-
-
-
-
-
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-
-
-
-
-
-
-
-
-
-%%%===================================================================
-%%% API
-%%%===================================================================
-
-mutation(Properties) ->
-    Cortex_Id = enn:clone(?cortex_id(Properties)),
-    apply_algorithms(?ALGORITHM_APPLY_ORDER, Cortex_Id, ?algorithm(Properties)),
-    Properties#{
-        cortex_id := Cortex_Id,
-        size      := nn_elements:size(edb:read(Cortex_Id))
-    }.
-
-
-
-
-mutation_function(Properties) ->
-    Cortex_Id = enn:clone(?cortex_id(Properties)),
-    apply_algorithms(?ALGORITHM_APPLY_ORDER, Cortex_Id, ?algorithm(Properties)),
-    Properties#{
-        cortex_id := Cortex_Id,
-        size      := nn_elements:size(edb:read(Cortex_Id))
-    }.
-
-apply_algorithms([FunKey | Functions], Cortex_Id, Algorithm) ->
-    Value = maps:get(FunKey, Algorithm),
-    try
-        algorithm:FunKey(Cortex_Id, Value, Algorithm)
-    catch
-        Type:Exception -> ?LOG_NOTICE("Algorithm application ~p failed: {~p, ~p}", [FunKey, Type, Exception])
-    end,
-    apply_algorithms(Functions, Cortex_Id, Algorithm);
-apply_algorithms([], _Cortex_Id, _Algorithm) ->
-    ok.
-
-
 
 
 %%====================================================================
