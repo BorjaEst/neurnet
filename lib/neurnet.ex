@@ -3,16 +3,23 @@ defmodule Neurnet do
   Documentation for `Neurnet`.
   """
 
+  ### =================================================================
+  ###  API
+  ### =================================================================
+
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Neurnet.hello()
-      :world
-
+  Returns a list of tuples with the record name and attributes
+  list. This is mainly used to prepare the tables in mnesia.
   """
-  def hello do
-    :world
+  @spec attributes_table() :: [{name :: atom, [attributes :: atom]}]
+  def attributes_table() do
+    [
+      {:actuator, Actuator.fields()},
+      {:group, Group.fields()}
+    ]
   end
+
+  ### =================================================================
+  ###  Internal functions
+  ### =================================================================
 end
