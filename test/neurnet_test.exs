@@ -2,6 +2,17 @@ defmodule NeurnetTest do
   use ExUnit.Case
   doctest Neurnet
 
+  test "Database write and read" do
+    id = Database.id(:test)
+    data = %{:id => id, :info => :someinfo}
+
+    assert {:atomic, data} ==
+             Database.run(fn ->
+               Database.write(data)
+               Database.read(id)
+             end)
+  end
+
   test "Neurnet fields" do
     assert Enum.sort(Actuator.fields()) ==
              Enum.sort([:id, :function])

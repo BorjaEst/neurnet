@@ -6,6 +6,10 @@ defmodule Neurnet.Application do
   use Application
 
   def start(_type, _args) do
+    true = Database.new_table(:actuator)
+    true = Database.new_table(:group)
+    true = Database.new_table(:test)
+
     children = [
       # Starts a worker by calling: Neurnet.Worker.start_link(arg)
       # {Neurnet.Worker, arg}
