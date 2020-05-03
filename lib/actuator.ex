@@ -14,7 +14,7 @@ defmodule Actuator do
           | {:stop, reason, nextState}
           | {:stop, reason, score, nextState}
 
-  defmacro actuator_id(name), do: {name, :actuator}
+  defmacro actuator_id(name), do: Database.id(:actuator, name)
 
   ### =================================================================
   ###  API
@@ -29,25 +29,41 @@ defmodule Actuator do
   @doc """
   Loads the actuators from the indicated modules.
   """
-  @spec load(modules :: [module :: atom]) :: [Actuator]
-  def load(modules) do
-    actuators_set = set_modules(modules, MapSet.new())
-    # Write in mnesia
-    MapSet.to_list(actuators_set)
+  @spec load(atom | [atom]) :: any
+  def load(modules) when is_list(modules) do
+    for m <- modules, do: load(m)
+  end
+
+  def load(module) do
+    actuators = Group.load(module) |> from_groups()
+
+    for name <- actuators do
+      Database.write(new_actuator(name, module))
+    end
   end
 
   ### =================================================================
   ###  Internal functions
   ### =================================================================
 
-  #  Loads the groups and returns a set with the collected actuators
-  defp set_modules([module | modules], set) do
-    groups = Group.load(module)
-    set = Enum.reduce(groups, set, &Group.add_members_to_set/2)
-    set_modules(modules, set)
+  # Creates an actuator with the defined id and function ------------
+  defp new_actuator(name, module) do
+    %Actuator{:id => actuator_id(name), :function => &module.name/2}
   end
 
-  defp set_modules([], actuators_set) do
-    actuators_set
+  # defp new_actuator(name, module) do
+  #   fun = fn signal, state -> apply(module, name, [signal, state]) end
+  #   %Actuator{:id => actuator_id(name), :function => fun}
+  # end
+
+  # Adds the group members to a set ---------------------------------
+  defp from_groups(groups) do
+    from_groups(MapSet.new(), groups) |> MapSet.to_list()
   end
+
+  defp from_groups(set, [%Group{} = group | groups]) do
+    MapSet.union(set, group.members) |> from_groups(groups)
+  end
+
+  defp from_groups(set, []), do: set
 end
