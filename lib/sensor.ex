@@ -1,33 +1,30 @@
-defmodule Actuator do
+defmodule Sensor do
   @moduledoc """
   """
   defstruct id: nil, function: nil
 
   @type state() :: map()
   @type next_state() :: state()
-  @type score() :: number()
-  @type error() :: number()
+  @type signal() :: number()
   @type reason() :: term()
   @type result() ::
-          {:ok, next_state}
-          | {:ok, error, score, next_state}
+          {:ok, signal, next_state}
           | {:stop, reason, next_state}
-          | {:stop, reason, score, next_state}
 
-  defmacro actuator_id(name), do: Database.id(:actuator, name)
+  defmacro sensor_id(name), do: Database.id(:sensor, name)
 
   ### =================================================================
   ###  API
   ### =================================================================
 
   @doc """
-  Returns the fields of an actuator structure
+  Returns the fields of an sensor structure
   """
   @spec fields() :: [atom()]
-  def fields(), do: Map.from_struct(%Actuator{}) |> Map.keys()
+  def fields(), do: Map.from_struct(%Sensor{}) |> Map.keys()
 
   @doc """
-  Loads the actuators from the indicated modules.
+  Loads the sensors from the indicated modules.
   """
   @spec load(atom | [atom]) :: any
   def load(modules) when is_list(modules) do
@@ -35,10 +32,10 @@ defmodule Actuator do
   end
 
   def load(module) do
-    actuators = Group.load(module) |> from_groups()
+    sensors = Group.load(module) |> from_groups()
 
-    for name <- actuators do
-      Database.write(new_actuator(name, module))
+    for name <- sensors do
+      Database.write(new_sensor(name, module))
     end
   end
 
@@ -46,10 +43,10 @@ defmodule Actuator do
   ###  Internal functions
   ### =================================================================
 
-  # Creates an actuator with the defined id and function ------------
-  defp new_actuator(function_name, module) do
-    fun = Function.capture(module, function_name, 2)
-    %Actuator{:id => actuator_id(function_name), :function => fun}
+  # Creates an sensor with the defined id and function ------------
+  defp new_sensor(function_name, module) do
+    fun = Function.capture(module, function_name, 1)
+    %Sensor{:id => sensor_id(function_name), :function => fun}
   end
 
   # Adds the group members to a set ---------------------------------

@@ -21,7 +21,7 @@ defmodule NeurnetTest do
   end
 
   test "Load test_actuators groups" do
-    {:atomic, groups} = Database.run(fn -> Group.load(TestActuators) end)
+    {:atomic, _} = Database.run(fn -> Group.load(TestActuators) end)
 
     {:atomic, g1} = Database.run(fn -> Database.read(:group, :gate_score) end)
     assert g1.members == MapSet.new([:xor_score])
@@ -40,5 +40,27 @@ defmodule NeurnetTest do
     {:atomic, a2} = Database.run(fn -> Database.read(:actuator, :null) end)
     assert a2.function == (&TestActuators.null/2)
     assert is_function(a2.function)
+  end
+
+  test "Load test_sensors groups" do
+    {:atomic, _} = Database.run(fn -> Group.load(TestSensors) end)
+
+    {:atomic, g1} = Database.run(fn -> Database.read(:group, :bool_input1) end)
+    assert g1.members == MapSet.new([:seq_1])
+
+    {:atomic, g2} = Database.run(fn -> Database.read(:group, :bool_input2) end)
+    assert g2.members == MapSet.new([:seq_2])
+  end
+
+  test "Load test_sensors sensors" do
+    {:atomic, _} = Database.run(fn -> Sensor.load(TestSensors) end)
+
+    {:atomic, s1} = Database.run(fn -> Database.read(:sensor, :seq_1) end)
+    assert s1.function == (&TestSensors.seq_1/1)
+    assert is_function(s1.function)
+
+    {:atomic, s2} = Database.run(fn -> Database.read(:sensor, :seq_2) end)
+    assert s2.function == (&TestSensors.seq_2/1)
+    assert is_function(s2.function)
   end
 end

@@ -29,7 +29,7 @@ defmodule TestActuators do
   @doc """
   Scores and agent according to the xor error. Backpropagation.
   """
-  def xor_score(), do: MapSet.new([])
+  def xor_score(), do: []
 
   @spec xor_score(number, map) :: Actuator.result()
   def xor_score(signal, state) do
@@ -40,7 +40,7 @@ defmodule TestActuators do
   @doc """
   This does nothing (to deactivate actuator).
   """
-  def null(), do: MapSet.new([:xor_score])
+  def null(), do: [:xor_score]
 
   @spec null(number, map) :: Actuator.result()
   def null(_signal, state) do
