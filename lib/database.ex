@@ -36,9 +36,17 @@ defmodule Database do
   Writes data in mnesia.
   Should run inside :mnesia transaction (or run/1)
   """
-  @spec write(entry) :: :ok
+  @spec write(entry) :: id
   def write(%{:id => {tname, _}} = data) do
-    :mnesia.write({tname, data.id, data})
+    :ok = :mnesia.write({tname, data.id, data})
+    data.id
+  end
+
+  @spec write(tname, term) :: id
+  def write(tname, data) do
+    id = id(tname)
+    :ok = :mnesia.write({tname, id, data})
+    id
   end
 
   @doc """
@@ -49,7 +57,15 @@ defmodule Database do
   def read({tname, _} = id) do
     case :mnesia.read(tname, id) do
       [{^tname, _, data}] -> data
-      [] -> nil
+      [] -> raise "not found #{id}"
+    end
+  end
+
+  @spec read(tname, term) :: term
+  def read(tname, ref) do
+    case :mnesia.read(tname, id(tname, ref)) do
+      [{^tname, _, data}] -> data
+      [] -> raise "not found #{ref} in table #{tname}"
     end
   end
 
