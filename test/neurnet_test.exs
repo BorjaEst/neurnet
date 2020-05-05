@@ -63,4 +63,16 @@ defmodule NeurnetTest do
     assert s2.function == (&TestSensors.seq_2/1)
     assert is_function(s2.function)
   end
+
+  test "Load test_architectures architectures" do
+    {:atomic, _} = Database.run(fn -> Architecture.load(TestArchitectures) end)
+
+    {:atomic, a1} = Database.run(fn -> Database.read(:architecture, :simple) end)
+    assert a1.dim == [2]
+    assert a1.type == :sequential
+
+    {:atomic, a2} = Database.run(fn -> Database.read(:architecture, :complex) end)
+    assert a2.dim == [3, 3]
+    assert a2.type == :recurrent
+  end
 end

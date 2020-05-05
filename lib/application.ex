@@ -7,8 +7,9 @@ defmodule Neurnet.Application do
 
   def start(_type, _args) do
     true = Database.new_table(:actuator)
-    true = Database.new_table(:sensor)
+    true = Database.new_table(:architecture)
     true = Database.new_table(:group)
+    true = Database.new_table(:sensor)
     true = Database.new_table(:test)
 
     children = [
