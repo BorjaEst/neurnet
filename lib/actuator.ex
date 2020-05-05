@@ -28,6 +28,7 @@ defmodule Actuator do
 
   @doc """
   Loads the actuators from the indicated modules.
+  Should run inside :mnesia transaction (or Database.run/1)
   """
   @spec load(atom | [atom]) :: any
   def load(modules) when is_list(modules) do

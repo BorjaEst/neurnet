@@ -17,6 +17,7 @@ defmodule Group do
 
   @doc """
   Loads the members of an specific group from a module.
+  Should run inside :mnesia transaction (or Database.run/1)
   """
   @spec load(module) :: [group :: struct]
   def load(module) do

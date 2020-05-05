@@ -39,7 +39,7 @@ defmodule Architecture do
 
     quote do
       @architectures [unquote(architecture_name) | @architectures]
-      @spec unquote(architecture_name)() :: Architecture.t
+      @spec unquote(architecture_name)() :: Architecture.t()
       def unquote(architecture_name)() do
         unquote(var_architecture) = unquote(def_architecture)
         unquote(block)
