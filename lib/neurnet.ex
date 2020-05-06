@@ -7,6 +7,14 @@ defmodule Neurnet do
   ###  API
   ### =================================================================
 
+  @doc """
+  Loads the actuators from the indicated modules.
+  """
+  @spec load(modules :: [module :: atom]) :: [Genotype]
+  def load(modules) do
+    Genotype.load(modules)
+  end
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================

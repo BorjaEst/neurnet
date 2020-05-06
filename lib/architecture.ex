@@ -1,7 +1,6 @@
 defmodule Architecture do
   @moduledoc """
   """
-
   defstruct id: nil, dim: nil, type: nil
 
   @doc false

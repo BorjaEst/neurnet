@@ -75,4 +75,18 @@ defmodule NeurnetTest do
     assert a2.dim == [3, 3]
     assert a2.type == :recurrent
   end
+
+  test "Load test_genotypes genotypes" do
+    {:atomic, _} = Database.run(fn -> Genotype.load(TestGenotypes) end)
+
+    {:atomic, g1} = Database.run(fn -> Database.read(:genotype, :dummy_gate) end)
+    assert g1.architecture == :simple
+    assert g1.actuators == [:gate_or_null]
+    assert g1.sensors == [:bool_input1, :bool_input2]
+
+    {:atomic, g2} = Database.run(fn -> Database.read(:genotype, :complex_gate) end)
+    assert g2.architecture == :complex
+    assert g2.actuators == [:gate_score]
+    assert g2.sensors == [:bool_input1, :bool_input2]
+  end
 end
