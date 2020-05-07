@@ -26,6 +26,7 @@ neurnet-*.tar
 
 # For now better avoid .elixir
 .elixir_ls
+mix.lock
 
 # Heritatet from erlang
 *~
