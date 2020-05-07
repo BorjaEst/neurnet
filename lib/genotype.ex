@@ -1,7 +1,7 @@
 defmodule Genotype do
   @moduledoc """
   """
-  defstruct id: nil, architecture: nil, actuators: nil, sensors: nil
+  defstruct id: nil, architecture: nil, actuators: [], sensors: []
 
   @doc false
   defmacro __using__(_opts) do
@@ -91,9 +91,9 @@ defmodule Genotype do
   Loads the genotypes from the indicated modules.
   Should run inside :mnesia transaction (or Database.run/1)
   """
-  @spec load(atom | [atom]) :: any
+  @spec load(atom | [atom]) :: [%Genotype{}]
   def load(modules) when is_list(modules) do
-    for m <- modules, do: load(m)
+    :lists.append(for m <- modules, do: load(m))
   end
 
   def load(module) do
@@ -104,6 +104,7 @@ defmodule Genotype do
     for name <- module.genotypes do
       genotype = %Genotype{} = apply(module, name, [])
       Database.write(genotype)
+      name
     end
   end
 

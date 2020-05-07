@@ -10,6 +10,7 @@ defmodule Neurnet.Application do
     true = Database.new_table(:architecture)
     true = Database.new_table(:genotype)
     true = Database.new_table(:group)
+    true = Database.new_table(:phenotype)
     true = Database.new_table(:sensor)
     true = Database.new_table(:test)
 

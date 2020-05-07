@@ -14,7 +14,7 @@ defmodule Neurnet.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :mnesia],
+      extra_applications: [:logger, :mnesia, :datalog, :enn, :eevo],
       mod: {Neurnet.Application, []}
     ]
   end
@@ -24,6 +24,10 @@ defmodule Neurnet.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:datalog, git: "git://github.com/BorjaEst/datalog.git", branch: "master"},
+      {:numerl, git: "git://github.com/BorjaEst/numerl.git", branch: "master"},
+      {:enn, git: "git://github.com/BorjaEst/enn.git", branch: "master"},
+      {:eevo, git: "git://github.com/BorjaEst/eevo.git", branch: "master"}
     ]
   end
 end
