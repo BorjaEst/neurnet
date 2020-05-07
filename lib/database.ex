@@ -53,16 +53,16 @@ defmodule Database do
   Reads data from mnesia
   Should run inside :mnesia transaction (or run/1)
   """
-  @spec read(id) :: term
-  def read({tname, _} = id) do
+  @spec read!(id) :: term
+  def read!({tname, _} = id) do
     case :mnesia.read(tname, id) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{id}"
     end
   end
 
-  @spec read(tname, term) :: term
-  def read(tname, ref) do
+  @spec read!(tname, term) :: term
+  def read!(tname, ref) do
     case :mnesia.read(tname, id(tname, ref)) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{ref} in table #{tname}"
@@ -75,6 +75,41 @@ defmodule Database do
   @spec run(operations) :: {:aborted, any} | {:atomic, any}
   def run(operations) do
     :mnesia.transaction(operations)
+  end
+
+  @doc """
+  Dirty data write in mnesia.
+  """
+  @spec dirty_write(entry) :: id
+  def dirty_write(%{:id => {tname, _}} = data) do
+    :ok = :mnesia.dirty_write({tname, data.id, data})
+    data.id
+  end
+
+  @spec dirty_write(tname, term) :: id
+  def dirty_write(tname, data) do
+    id = id(tname)
+    :ok = :mnesia.dirty_write({tname, id, data})
+    id
+  end
+
+  @doc """
+  Dirty data read from mnesia
+  """
+  @spec dirty_read!(id) :: term
+  def dirty_read!({tname, _} = id) do
+    case :mnesia.dirty_read(tname, id) do
+      [{^tname, _, data}] -> data
+      [] -> raise "not found #{id}"
+    end
+  end
+
+  @spec dirty_read!(tname, term) :: term
+  def dirty_read!(tname, ref) do
+    case :mnesia.dirty_read(tname, id(tname, ref)) do
+      [{^tname, _, data}] -> data
+      [] -> raise "not found #{ref} in table #{tname}"
+    end
   end
 
   ### =================================================================
