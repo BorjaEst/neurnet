@@ -25,6 +25,18 @@ defmodule Neurnet do
     Database.dirty_write(:phenotype, phenotype)
   end
 
+  @doc """
+  Creates an eevo agent from a phenotype to run in a population.
+  """
+  @spec agent_from(phenotype :: Phenotype.id()) :: :agent.id()
+  def agent_from(phenotype_id) do
+    :eevo.agent(%{
+      function: &Phenotype.controller/1,
+      mutation: &Phenotype.mutate/1,
+      arguments: [phenotype_id]
+    })
+  end
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================

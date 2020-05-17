@@ -35,6 +35,11 @@ defmodule Phenotype do
   def mutate(%Sensor{}), do: :ok
   def mutate(network_id), do: :ok
 
+  @doc """
+  TBD
+  """
+  def controller(phenotype_id), do: :ok
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================
