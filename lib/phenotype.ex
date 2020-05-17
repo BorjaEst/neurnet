@@ -29,7 +29,15 @@ defmodule Phenotype do
   @doc """
   TBD
   """
-  def mutate(%Genotype{}), do: :ok
+  def mutate(%Phenotype{} = phenotype) do
+    %Phenotype{
+      # id: Database.id(:phenotype),
+      # network: :enn.compile(model(genotype)),
+      # actuators: select(genotype.actuators),
+      # sensors: select(genotype.sensors)
+    }
+  end
+
   # Add to actuators the mutation info
   def mutate(%Actuator{}), do: :ok
   def mutate(%Sensor{}), do: :ok
@@ -45,7 +53,7 @@ defmodule Phenotype do
   ### =================================================================
 
   defp model(%Genotype{} = genotype) do
-    architecture = Database.dirty_read!(:architecture, genotype.architecture)
+    architecture = Database.dirty_read!(genotype.architecture, :architecture)
     inputs = :layer.input(length(genotype.sensors))
     hidden = Enum.map(architecture.dim, fn n -> :layer.dense(n) end)
     outputs = :layer.output(length(genotype.actuators))
@@ -57,7 +65,7 @@ defmodule Phenotype do
   end
 
   defp select(g_id) do
-    group = Database.dirty_read!(:group, g_id)
+    group = Database.dirty_read!(g_id, :group)
     Enum.random(group.members)
   end
 end

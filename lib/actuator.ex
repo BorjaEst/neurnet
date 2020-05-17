@@ -14,7 +14,7 @@ defmodule Actuator do
           | {:stop, reason, next_state}
           | {:stop, reason, score, next_state}
 
-  defmacro actuator_id(name), do: Database.id(:actuator, name)
+  defmacro actuator_id(name), do: Database.id(name, :actuator)
 
   ### =================================================================
   ###  API

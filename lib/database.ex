@@ -2,7 +2,7 @@ defmodule Database do
   @moduledoc """
   """
   @type tname :: atom
-  @type id :: {tname, term}
+  @type id :: {term, tname}
   @type entry :: %{required(:id) => id, optional(term) => term}
   @type operations :: function
   @attributes [:id, :data]
@@ -27,23 +27,23 @@ defmodule Database do
   Creates entry id
   """
   @spec id(tname) :: id
-  def id(tname), do: {tname, make_ref()}
+  def id(tname), do: {make_ref(), tname}
 
-  @spec id(tname, term) :: id
-  def id(tname, ref), do: {tname, ref}
+  @spec id(term, tname) :: id
+  def id(ref, tname), do: {ref, tname}
 
   @doc """
   Writes data in mnesia.
   Should run inside :mnesia transaction (or run/1)
   """
   @spec write(entry) :: id
-  def write(%{:id => {tname, _}} = data) do
+  def write(%{:id => {_, tname}} = data) do
     :ok = :mnesia.write({tname, data.id, data})
     data.id
   end
 
-  @spec write(tname, term) :: id
-  def write(tname, data) do
+  @spec write(term, tname) :: id
+  def write(data, tname) do
     id = id(tname)
     :ok = :mnesia.write({tname, id, data})
     id
@@ -54,16 +54,16 @@ defmodule Database do
   Should run inside :mnesia transaction (or run/1)
   """
   @spec read!(id) :: term
-  def read!({tname, _} = id) do
+  def read!({_, tname} = id) do
     case :mnesia.read(tname, id) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{id}"
     end
   end
 
-  @spec read!(tname, term) :: term
-  def read!(tname, ref) do
-    case :mnesia.read(tname, id(tname, ref)) do
+  @spec read!(term, tname) :: term
+  def read!(ref, tname) do
+    case :mnesia.read(tname, id(ref, tname)) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{ref} in table #{tname}"
     end
@@ -81,13 +81,13 @@ defmodule Database do
   Dirty data write in mnesia.
   """
   @spec dirty_write(entry) :: id
-  def dirty_write(%{:id => {tname, _}} = data) do
+  def dirty_write(%{:id => {_, tname}} = data) do
     :ok = :mnesia.dirty_write({tname, data.id, data})
     data.id
   end
 
-  @spec dirty_write(tname, term) :: id
-  def dirty_write(tname, data) do
+  @spec dirty_write(term, tname) :: id
+  def dirty_write(data, tname) do
     id = id(tname)
     :ok = :mnesia.dirty_write({tname, id, data})
     id
@@ -97,15 +97,15 @@ defmodule Database do
   Dirty data read from mnesia
   """
   @spec dirty_read!(id) :: term
-  def dirty_read!({tname, _} = id) do
+  def dirty_read!({_, tname} = id) do
     case :mnesia.dirty_read(tname, id) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{id}"
     end
   end
 
-  @spec dirty_read!(tname, term) :: term
-  def dirty_read!(tname, ref) do
+  @spec dirty_read!(term, tname) :: term
+  def dirty_read!(ref, tname) do
     case :mnesia.dirty_read(tname, id(tname, ref)) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{ref} in table #{tname}"

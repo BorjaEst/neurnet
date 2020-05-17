@@ -33,7 +33,7 @@ defmodule Architecture do
 
     def_architecture =
       Macro.escape(%Architecture{
-        id: Database.id(:architecture, architecture_name)
+        id: Database.id(architecture_name, :architecture)
       })
 
     quote do

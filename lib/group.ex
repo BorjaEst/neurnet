@@ -3,7 +3,7 @@ defmodule Group do
   """
   defstruct id: nil, members: nil
 
-  defmacro group_id(name), do: Database.id(:group, name)
+  defmacro group_id(name), do: Database.id(name, :group)
 
   ### =================================================================
   ###  API

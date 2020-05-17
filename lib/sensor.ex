@@ -11,7 +11,7 @@ defmodule Sensor do
           {:ok, signal, next_state}
           | {:stop, reason, next_state}
 
-  defmacro sensor_id(name), do: Database.id(:sensor, name)
+  defmacro sensor_id(name), do: Database.id(name, :sensor)
 
   ### =================================================================
   ###  API

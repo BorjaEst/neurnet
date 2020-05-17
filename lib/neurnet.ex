@@ -6,7 +6,6 @@ defmodule Neurnet do
   @type genotype :: atom()
   @type phenotype :: Phenotype.id()
 
-
   ### =================================================================
   ###  API
   ### =================================================================
@@ -23,10 +22,11 @@ defmodule Neurnet do
   Creates a phenotype from a genotype.
   """
   @spec phenotype_from(genotype) :: :agent.id()
-  def phenotype_from(gref) do
-    genotype = Database.dirty_read!(:genotype, gref)
-    phenotype = Phenotype.from(genotype)
-    Database.dirty_write(:phenotype, phenotype)
+  def phenotype_from(genotype) do
+    genotype
+    |> Database.dirty_read!(:genotype)
+    |> Phenotype.from()
+    |> Database.dirty_write(:phenotype)
   end
 
   @doc """
@@ -39,6 +39,13 @@ defmodule Neurnet do
       mutation: &Phenotype.mutate/1,
       arguments: [phenotype_id]
     })
+  end
+
+  def mutate(phenotype) do
+    phenotype
+    |> Database.dirty_read!(:phenotype)
+    |> Phenotype.mutate()
+    |> Database.dirty_write(:phenotype)
   end
 
   ### =================================================================

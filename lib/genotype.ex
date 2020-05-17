@@ -33,7 +33,7 @@ defmodule Genotype do
 
     def_genotype =
       Macro.escape(%Genotype{
-        id: Database.id(:genotype, genotype_name)
+        id: Database.id(genotype_name, :genotype)
       })
 
     quote do
