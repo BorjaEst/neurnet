@@ -9,8 +9,10 @@ defmodule NeurnetTest do
 
   test "Phenotype from genotype" do
     id = Neurnet.phenotype_from(:dummy_gate)
-    penotype = Database.dirty_read!(id)
+    phenotype = Database.dirty_read!(id)
 
-    assert true
+    assert [] == phenotype.actuators -- [:xor_score, :null]
+    assert [] == phenotype.sensors -- [:seq_1, :seq_2]
+    assert %{type: :sequential, size: 5} == :enn.info(phenotype.network)
   end
 end
