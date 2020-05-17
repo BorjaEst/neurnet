@@ -106,7 +106,7 @@ defmodule Database do
 
   @spec dirty_read!(term, tname) :: term
   def dirty_read!(ref, tname) do
-    case :mnesia.dirty_read(tname, id(tname, ref)) do
+    case :mnesia.dirty_read(tname, id(ref, tname)) do
       [{^tname, _, data}] -> data
       [] -> raise "not found #{ref} in table #{tname}"
     end
