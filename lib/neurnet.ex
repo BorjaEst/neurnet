@@ -3,6 +3,10 @@ defmodule Neurnet do
   Documentation for `Neurnet`.
   """
 
+  @type genotype :: atom()
+  @type phenotype :: Phenotype.id()
+
+
   ### =================================================================
   ###  API
   ### =================================================================
@@ -18,7 +22,7 @@ defmodule Neurnet do
   @doc """
   Creates a phenotype from a genotype.
   """
-  @spec phenotype_from(genotype :: atom) :: :agent.id()
+  @spec phenotype_from(genotype) :: :agent.id()
   def phenotype_from(gref) do
     genotype = Database.dirty_read!(:genotype, gref)
     phenotype = Phenotype.from(genotype)
@@ -28,7 +32,7 @@ defmodule Neurnet do
   @doc """
   Creates an eevo agent from a phenotype to run in a population.
   """
-  @spec agent_from(phenotype :: Phenotype.id()) :: :agent.id()
+  @spec agent_from(phenotype) :: :agent.id()
   def agent_from(phenotype_id) do
     :eevo.agent(%{
       function: &Phenotype.controller/1,
