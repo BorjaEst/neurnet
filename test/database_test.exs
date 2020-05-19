@@ -9,14 +9,6 @@ defmodule DatabaseTest do
              Database.run(fn -> Database.write(data, :test) |> Database.read!() end)
   end
 
-  test "Neurnet fields" do
-    assert Enum.sort(Actuator.fields()) ==
-             Enum.sort([:id, :function])
-
-    assert Enum.sort(Group.fields()) ==
-             Enum.sort([:id, :members])
-  end
-
   test "Load test_actuators groups" do
     {:atomic, _} = Database.run(fn -> Group.load(TestActuators) end)
 

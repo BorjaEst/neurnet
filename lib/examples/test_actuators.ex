@@ -40,7 +40,7 @@ defmodule TestActuators do
   @doc """
   This does nothing (to deactivate actuator).
   """
-  def null(), do: [:xor_score]
+  def null(), do: [{:xor_score, 0.1}]
 
   @spec null(number, map) :: Actuator.result()
   def null(_signal, state) do

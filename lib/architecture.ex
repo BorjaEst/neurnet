@@ -94,7 +94,77 @@ defmodule Architecture do
     end
   end
 
+  @doc """
+  Mutates the neuronal network
+  """
+  def mutate(network) do
+    {:atomic, :ok} = :enn_edit.transaction(network, &mutate_network/1)
+    network
+  end
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================
+
+  # Randomly mutates a neural network -------------------------------
+  defp mutate_network(enn) do
+    ns = :network.neurons(enn)
+    sf = :math.sqrt(Map.get(:network.info(enn), :size))
+
+    enn
+    |> maybe_divide_neuron(ns)
+    |> maybe_merge_neurons(ns)
+    |> maybe_increasse_connections(ns, 1 / sf)
+    |> mutate_neurons(:ltools.rand(ns, 1 / sf))
+  end
+
+  @chance 0.05
+  defp maybe_divide_neuron(enn, neurons) do
+    n = :ltools.randnth(neurons)
+    maybe(@chance, &:enn_edit.divide_neuron/2, [enn, n])
+  end
+
+  @chance 0.05
+  defp maybe_merge_neurons(enn, neurons) do
+    n1 = :ltools.randnth(neurons)
+    n2 = :ltools.randnth(neurons)
+    maybe(@chance, &:enn_edit.merge_neurons/3, [enn, n1, n2])
+  end
+
+  @chance 0.05
+  defp maybe_increasse_connections(enn, ns, percentage) do
+    from = :ltools.rand(ns, percentage)
+    to = :ltools.rand(ns, percentage)
+    maybe(@chance, &:enn_edit.connect_all/3, [enn, from, to])
+  end
+
+  # Randomly mutates a neuron network -------------------------------
+  defp mutate_neurons(enn, [neuron | ns]) do
+    enn
+    |> maybe_reinitialise_bias(neuron)
+    |> maybe_switch_activation(neuron)
+    |> mutate_neurons(ns)
+  end
+
+  defp mutate_neurons(enn, []), do: enn
+
+  @chance 0.15
+  defp maybe_reinitialise_bias(enn, neuron) do
+    maybe(@chance, &:enn_edit.reinitialise_bias/2, [enn, neuron])
+  end
+
+  @chance 0.15
+  @functions [:direct, :sigmoid, :tanh, :elu]
+  defp maybe_switch_activation(enn, neuron) do
+    func = :ltools.randnth(@functions)
+    maybe(@chance, &:enn_edit.switch_activation/2, [enn, neuron, func])
+  end
+
+  # Maybe applies the function over enn or returns the enn ----------
+  defp maybe(probability, fun, [enn | _] = args) do
+    case :rand.uniform() do
+      x when x < probability -> apply(fun, args)
+      _ -> enn
+    end
+  end
 end

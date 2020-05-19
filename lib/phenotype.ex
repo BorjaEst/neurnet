@@ -14,6 +14,14 @@ defmodule Phenotype do
   def fields(), do: Map.from_struct(%Phenotype{}) |> Map.keys()
 
   @doc """
+  Clones a phenotype
+  """
+  @spec from(%Phenotype{}) :: %Phenotype{}
+  def clone(%Phenotype{} = phenotype) do
+    %{phenotype | id: Database.id(:phenotype), network: :enn.clone(phenotype.network)}
+  end
+
+  @doc """
   Builds a phenotype from a genotype
   """
   @spec from(%Genotype{}) :: %Phenotype{}
@@ -27,21 +35,15 @@ defmodule Phenotype do
   end
 
   @doc """
-  TBD
+  Mutates the phenotype modifying the network, sensors and actuators
   """
   def mutate(%Phenotype{} = phenotype) do
     %Phenotype{
-      # id: Database.id(:phenotype),
-      # network: :enn.compile(model(genotype)),
-      # actuators: select(genotype.actuators),
-      # sensors: select(genotype.sensors)
+      network: Architecture.mutate(phenotype.network),
+      actuators: for(x <- phenotype.actuators, do: Actuator.mutate(x)),
+      sensors: for(x <- phenotype.sensors, do: Sensor.mutate(x))
     }
   end
-
-  # Add to actuators the mutation info
-  def mutate(%Actuator{}), do: :ok
-  def mutate(%Sensor{}), do: :ok
-  def mutate(network_id), do: :ok
 
   @doc """
   TBD

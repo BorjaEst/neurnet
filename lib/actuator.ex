@@ -1,7 +1,7 @@
 defmodule Actuator do
   @moduledoc """
   """
-  defstruct id: nil, function: nil
+  defstruct id: nil, function: nil, evolution: []
 
   @type state() :: map()
   @type next_state() :: state()
@@ -43,14 +43,29 @@ defmodule Actuator do
     end
   end
 
+  @doc """
+  Performs a random evaluation and if true, mutates the actuator
+  """
+  def mutate(name) do
+    actuator = Database.dirty_read!(name, :actuator)
+
+    case :ltools.rand_scale(actuator.evolution) do
+      {} -> name
+      new -> new
+    end
+  end
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================
 
   # Creates an actuator with the defined id and function ------------
   defp new_actuator(function_name, module) do
-    fun = Function.capture(module, function_name, 2)
-    %Actuator{:id => actuator_id(function_name), :function => fun}
+    %Actuator{
+      id: actuator_id(function_name),
+      function: Function.capture(module, function_name, 2),
+      evolution: apply(module, function_name, [])
+    }
   end
 
   # Adds the group members to a set ---------------------------------

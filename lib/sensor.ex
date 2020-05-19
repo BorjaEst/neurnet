@@ -1,7 +1,7 @@
 defmodule Sensor do
   @moduledoc """
   """
-  defstruct id: nil, function: nil
+  defstruct id: nil, function: nil, evolution: []
 
   @type state() :: map()
   @type next_state() :: state()
@@ -40,14 +40,29 @@ defmodule Sensor do
     end
   end
 
+  @doc """
+  Performs a random evaluation and if true, mutates the sensor
+  """
+  def mutate(name) do
+    sensor = Database.dirty_read!(name, :sensor)
+
+    case :ltools.rand_scale(sensor.evolution) do
+      {} -> name
+      new -> new
+    end
+  end
+
   ### =================================================================
   ###  Internal functions
   ### =================================================================
 
   # Creates an sensor with the defined id and function ------------
   defp new_sensor(function_name, module) do
-    fun = Function.capture(module, function_name, 1)
-    %Sensor{:id => sensor_id(function_name), :function => fun}
+    fun = %Sensor{
+      id: sensor_id(function_name),
+      function: Function.capture(module, function_name, 1),
+      evolution: apply(module, function_name, [])
+    }
   end
 
   # Adds the group members to a set ---------------------------------

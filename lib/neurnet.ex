@@ -41,9 +41,10 @@ defmodule Neurnet do
     })
   end
 
-  def mutate(phenotype) do
-    phenotype
+  def mutate({reference, :phenotype}) do
+    reference
     |> Database.dirty_read!(:phenotype)
+    |> Phenotype.clone()
     |> Phenotype.mutate()
     |> Database.dirty_write(:phenotype)
   end
