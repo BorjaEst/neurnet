@@ -43,6 +43,7 @@ defmodule Sensor do
   @doc """
   Performs a random evaluation and if true, mutates the sensor
   """
+  @spec mutate(atom) :: atom
   def mutate(name) do
     sensor = Database.dirty_read!(name, :sensor)
 
@@ -58,7 +59,7 @@ defmodule Sensor do
 
   # Creates an sensor with the defined id and function ------------
   defp new_sensor(function_name, module) do
-    fun = %Sensor{
+    %Sensor{
       id: sensor_id(function_name),
       function: Function.capture(module, function_name, 1),
       evolution: apply(module, function_name, [])

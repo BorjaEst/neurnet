@@ -46,6 +46,7 @@ defmodule Actuator do
   @doc """
   Performs a random evaluation and if true, mutates the actuator
   """
+  @spec mutate(atom) :: atom
   def mutate(name) do
     actuator = Database.dirty_read!(name, :actuator)
 
