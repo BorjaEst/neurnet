@@ -18,7 +18,8 @@ defmodule Phenotype do
   """
   @spec from(%Phenotype{}) :: %Phenotype{}
   def clone(%Phenotype{} = phenotype) do
-    %{phenotype | id: Database.id(:phenotype), network: :enn.clone(phenotype.network)}
+    %{phenotype | id: Database.id(:phenotype)}
+    %{phenotype | network: :enn.clone(phenotype.network)}
   end
 
   @doc """
