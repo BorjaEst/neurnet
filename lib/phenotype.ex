@@ -34,9 +34,11 @@ defmodule Phenotype do
     }
   end
 
+
   @doc """
   Mutates the phenotype modifying the network, sensors and actuators
   """
+  @spec mutate(%Phenotype{}) :: %Phenotype{}
   def mutate(%Phenotype{} = phenotype) do
     %Phenotype{
       network: Architecture.mutate(phenotype.network),
