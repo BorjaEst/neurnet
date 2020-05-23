@@ -3,16 +3,15 @@ defmodule Actuator do
   """
   defstruct id: nil, function: nil, evolution: []
 
-  @type state() :: map()
-  @type next_state() :: state()
+  @type data() :: map()
   @type score() :: number()
   @type error() :: number()
   @type reason() :: term()
   @type result() ::
-          {:ok, next_state}
-          | {:ok, error, score, next_state}
-          | {:stop, reason, next_state}
-          | {:stop, reason, score, next_state}
+          {:ok, score(), data()}
+          | {:ok, error(), score(), data()}
+          | {:stop, reason()}
+          | {:stop, reason(), score()}
 
   defmacro actuator_id(name), do: Database.id(name, :actuator)
 
@@ -54,6 +53,14 @@ defmodule Actuator do
       {} -> name
       new -> new
     end
+  end
+
+  @doc """
+  Executes an actuator function
+  """
+  @spec run(%Actuator{}, number(), data()) :: result()
+  def run(%Actuator{function: function}, signal, data) do
+    apply(function, [signal, data])
   end
 
   ### =================================================================

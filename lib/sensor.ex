@@ -3,13 +3,12 @@ defmodule Sensor do
   """
   defstruct id: nil, function: nil, evolution: []
 
-  @type state() :: map()
-  @type next_state() :: state()
+  @type data() :: map()
   @type signal() :: number()
   @type reason() :: term()
   @type result() ::
-          {:ok, signal, next_state}
-          | {:stop, reason, next_state}
+          {:ok, signal(), data()}
+          | {:stop, reason()}
 
   defmacro sensor_id(name), do: Database.id(name, :sensor)
 
@@ -51,6 +50,14 @@ defmodule Sensor do
       {} -> name
       new -> new
     end
+  end
+
+  @doc """
+  Executes a sensor function
+  """
+  @spec run(%Sensor{}, data()) :: result()
+  def run(%Sensor{function: function}, data) do
+    apply(function, [data])
   end
 
   ### =================================================================

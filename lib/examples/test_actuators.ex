@@ -34,7 +34,7 @@ defmodule TestActuators do
   @spec xor_score(number, map) :: Actuator.result()
   def xor_score(signal, state) do
     error = signal - num_xor(state.i1, state.i2)
-    {:ok, error, score(error), %{state | :bool_in => []}}
+    {:ok, error, score(error), state}
   end
 
   @doc """
@@ -44,7 +44,8 @@ defmodule TestActuators do
 
   @spec null(number, map) :: Actuator.result()
   def null(_signal, state) do
-    {:ok, state}
+    score = 0.0
+    {:ok, score, state}
   end
 
   ### =================================================================

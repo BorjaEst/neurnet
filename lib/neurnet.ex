@@ -41,12 +41,26 @@ defmodule Neurnet do
     })
   end
 
+  @doc """
+  Mutates a phenotype returning its child id
+  """
+  @spec mutate({any, :phenotype}) :: {reference, atom}
   def mutate({reference, :phenotype}) do
     reference
     |> Database.dirty_read!(:phenotype)
     |> Phenotype.clone()
     |> Phenotype.mutate()
     |> Database.dirty_write(:phenotype)
+  end
+
+  @doc """
+  Runs a training evolutionary algorithm with phenotypes
+  """
+  @spec run(atom(), genotype(), number(), function()) :: :eevo.results()
+  def run(name, genotype, parallel, stop_condition) do
+    phenotypes = for _ <- 1..parallel, do: phenotype_from(genotype)
+    agents = for p <- phenotypes, do: agent_from(p)
+    :eevo.run(name, agents, parallel, stop_condition)
   end
 
   ### =================================================================

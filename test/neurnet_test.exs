@@ -47,4 +47,11 @@ defmodule NeurnetTest do
     assert phenotype_1.network != phenotype_2.network
     assert :sequential == Map.get(:enn.info(phenotype_2.network), :type)
   end
+
+  test "Run training of dummy gate" do
+    stop_condition = fn %{runtime: x} -> x > 2000 end
+    result = Neurnet.run(:test_dummy, :dummy_gate, 3, stop_condition)
+
+    assert result == %{}
+  end
 end

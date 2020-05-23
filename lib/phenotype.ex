@@ -35,7 +35,6 @@ defmodule Phenotype do
     }
   end
 
-
   @doc """
   Mutates the phenotype modifying the network, sensors and actuators
   """
@@ -48,10 +47,80 @@ defmodule Phenotype do
     }
   end
 
+  ### =================================================================
+  ###  Internal functions
+  ### =================================================================
+
+  @spec controller(Database.id()) :: :eevo.agent_return()
   @doc """
-  TBD
+  Starts the phenotype loop
   """
-  def controller(phenotype_id), do: :ok
+  def controller(phenotype_id) do
+    phenotype = Database.dirty_read!(phenotype_id)
+    :enn.start(phenotype.network)
+    :enn.link(phenotype.network)
+
+    state = %{
+      cortex: :enn.cortex(phenotype.network),
+      actuators: for(x <- phenotype.actuators, do: Database.dirty_read!(x, :actuator)),
+      sensors: for(x <- phenotype.sensors, do: Database.dirty_read!(x, :sensor)),
+      data: %{}
+    }
+
+    {:next, &enter_sensors/1, [state]}
+  end
+
+  @doc """
+  Gets the signals from the phenotype sensors
+  """
+  def enter_sensors(state) do
+    run_sensors([], state.sensors, state)
+  end
+
+  def run_sensors(signals, [sensor | sx], state) do
+    case Sensor.run(sensor, state.data) do
+      {:ok, signal, data} ->
+        run_sensors([signal | signals], sx, %{state | data: data})
+
+      {:stop, reason} ->
+        {:stop, reason}
+    end
+  end
+
+  def run_sensors(signals, [], state) do
+    {:next, &enter_actuators/2, [signals, state]}
+  end
+
+  @doc """
+  Converts the sensors signals into actuator inputs and executes the actuators
+  """
+  def enter_actuators(signals, state) do
+    predictions = :cortex.predict(state.cortex, signals)
+    run_actuators([], 0.0, predictions, state.actuators, state)
+  end
+
+  def run_actuators(errs, s_acc, [pred | px], [actuator | ax], state) do
+    case Actuator.run(actuator, pred, state.data) do
+      {:ok, score, data} ->
+        s_acc = score + s_acc
+        run_actuators([0.0 | errs], s_acc, px, ax, %{state | data: data})
+
+      {:ok, err, score, data} ->
+        s_acc = score + s_acc
+        run_actuators([err | errs], s_acc, px, ax, %{state | data: data})
+
+      {:stop, reason} ->
+        {:stop, reason, []}
+
+      {:stop, reason, score} ->
+        {:stop, reason, [{:score, score}]}
+    end
+  end
+
+  def run_actuators(errors, score_acc, [], [], state) do
+    _bp_errors = :cortex.fit(state.cortex, errors)
+    {:next, &enter_sensors/1, state, [{:score, score_acc}]}
+  end
 
   ### =================================================================
   ###  Internal functions
