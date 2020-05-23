@@ -23,7 +23,6 @@ erl_crash.dump
 neurnet-*.tar
 
 
-
 # For now better avoid .elixir
 .elixir_ls
 mix.lock
@@ -48,3 +47,7 @@ rebar.lock
 .rebar
 .rebar3
 .erlang.cookie
+
+# vscode
+.vscode
+
