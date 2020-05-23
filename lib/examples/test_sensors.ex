@@ -35,17 +35,9 @@ defmodule TestSensors do
     {:ok, signal, %{state | i1: signal, seq_1: sx}}
   end
 
-  def seq_1(%{seq_1: []} = state) do
-    {:stop, "end of training", state}
-  end
-
-  def seq_1(%{i1: _} = state) do
-    seq_1(Map.put(state, :seq_1, @xor_seq))
-  end
-
-  def seq_1(%{} = state) do
-    seq_1(Map.put(state, :i1, []))
-  end
+  def seq_1(%{seq_1: []}), do: {:stop, :normal}
+  def seq_1(%{i1: _} = state), do: seq_1(Map.put(state, :seq_1, @xor_seq))
+  def seq_1(%{} = state), do: seq_1(Map.put(state, :i1, []))
 
   @doc """
   Returns a boolean in an specific sequence.
@@ -58,17 +50,9 @@ defmodule TestSensors do
     {:ok, signal, %{state | i2: signal, seq_2: sx}}
   end
 
-  def seq_2(%{seq_2: []} = state) do
-    {:stop, "end of training", state}
-  end
-
-  def seq_2(%{s_in: _} = state) do
-    seq_2(Map.put(state, :seq_2, @xor_seq))
-  end
-
-  def seq_2(%{} = state) do
-    seq_2(Map.put(state, :i2, []))
-  end
+  def seq_2(%{seq_2: []}), do: {:stop, :normal}
+  def seq_2(%{i2: _} = state), do: seq_2(Map.put(state, :seq_2, @xor_seq))
+  def seq_2(%{} = state), do: seq_2(Map.put(state, :i2, []))
 
   ### =================================================================
   ###  Internal functions
