@@ -22,11 +22,6 @@ defmodule NeurnetTest do
              Enum.sort([:id, :network, :actuators, :sensors])
   end
 
-  test "Load test_genotypes genotypes" do
-    {:atomic, gx} = Neurnet.load([TestGenotypes])
-    assert MapSet.new(gx) == MapSet.new([:dummy_gate, :complex_gate])
-  end
-
   test "Phenotype from genotype" do
     id = Neurnet.phenotype_from(:dummy_gate)
     phenotype = Database.dirty_read!(id)
