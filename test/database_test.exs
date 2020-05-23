@@ -1,6 +1,5 @@
 defmodule DatabaseTest do
-  use ExUnit.Case
-  doctest Neurnet
+  use ExUnit.Case, async: true
 
   test "Database write and read" do
     data = %{:info => :someinfo}

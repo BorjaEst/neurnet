@@ -1,25 +1,10 @@
 defmodule NeurnetTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Neurnet
 
-  test "Neurnet fields" do
-    assert Enum.sort(Actuator.fields()) ==
-             Enum.sort([:id, :function, :evolution])
-
-    assert Enum.sort(Sensor.fields()) ==
-             Enum.sort([:id, :function, :evolution])
-
-    assert Enum.sort(Group.fields()) ==
-             Enum.sort([:id, :members])
-
-    assert Enum.sort(Architecture.fields()) ==
-             Enum.sort([:id, :dim, :type])
-
-    assert Enum.sort(Genotype.fields()) ==
-             Enum.sort([:id, :architecture, :actuators, :sensors])
-
-    assert Enum.sort(Phenotype.fields()) ==
-             Enum.sort([:id, :network, :actuators, :sensors])
+  setup %{} do
+    {:atomic, gx} = Neurnet.load([TestGenotypes])
+    %{genotypes: gx}
   end
 
   test "Phenotype from genotype" do
@@ -44,9 +29,12 @@ defmodule NeurnetTest do
   end
 
   test "Run training of dummy gate" do
-    stop_condition = fn %{runtime: x} -> x > 2000 end
-    result = Neurnet.run(:test_dummy, :dummy_gate, 3, stop_condition)
+    stop_condition = fn %{runtime: x} -> x > 1000 end
+    result = Neurnet.run(:test_dummy, :dummy_gate, 100, stop_condition)
 
-    assert result == %{}
+    assert result.population.run_data.runtime >= 1000
+    IO.inspect(result.population.run_data)
+    assert is_map(result.tree)
+    assert map_size(result.tree) > 0
   end
 end
