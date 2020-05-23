@@ -48,7 +48,7 @@ defmodule Phenotype do
   end
 
   ### =================================================================
-  ###  Internal functions
+  ### Phenotype callbacks
   ### =================================================================
 
   @spec controller(Database.id()) :: :eevo.agent_return()
@@ -119,7 +119,7 @@ defmodule Phenotype do
 
   def run_actuators(errors, score_acc, [], [], state) do
     _bp_errors = :cortex.fit(state.cortex, errors)
-    {:next, &enter_sensors/1, state, [{:score, score_acc}]}
+    {:next, &enter_sensors/1, [state], [{:score, score_acc}]}
   end
 
   ### =================================================================

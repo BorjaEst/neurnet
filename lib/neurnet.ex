@@ -32,19 +32,23 @@ defmodule Neurnet do
   @doc """
   Creates an eevo agent from a phenotype to run in a population.
   """
-  @spec agent_from(phenotype) :: :agent.id()
+  @spec agent_from(phenotype()) :: :agent.id()
   def agent_from(phenotype_id) do
     :eevo.agent(%{
       function: &Phenotype.controller/1,
-      mutation: &Phenotype.mutate/1,
+      mutation: &Neurnet.mutate/1,
       arguments: [phenotype_id]
     })
   end
 
   @doc """
-  Mutates a phenotype returning its child id
+  Mutates a list of phenotypes returning their childs id
   """
-  @spec mutate({any, :phenotype}) :: {reference, atom}
+  @spec mutate([phenotype()]) :: phenotype()
+  def mutate(list) when is_list(list) do
+    Enum.map(list, &mutate/1)
+  end
+
   def mutate({reference, :phenotype}) do
     reference
     |> Database.dirty_read!(:phenotype)
