@@ -1,5 +1,21 @@
-# neurnet
-Deep learning application based on Erlang and Python modules
+# Neurnet
 
-# Important
-If developing with parallel applications into release use _checkouts to solve dependencies
+**TODO: Add description**
+
+## Installation
+
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+by adding `neurnet` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:neurnet, "~> 0.1.0"}
+  ]
+end
+```
+
+Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
+and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
+be found at [https://hexdocs.pm/neurnet](https://hexdocs.pm/neurnet).
+
