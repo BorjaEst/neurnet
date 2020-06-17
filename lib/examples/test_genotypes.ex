@@ -6,7 +6,6 @@ defmodule TestGenotypes do
   ###  Modules to preload
   ### =================================================================
 
-  def architectures, do: [TestArchitectures]
   def actuators, do: [TestActuators]
   def sensors, do: [TestSensors]
 
@@ -18,18 +17,21 @@ defmodule TestGenotypes do
   @doc """
   Simple genotype with low probability of success.
   """
-  defgenotype "dummy_gate" do
-    architecture(:simple)
-    actuators([:gate_or_null])
-    sensors([:bool_input1, :bool_input2])
+  genotype "dummy_gate" do
+    inputs([:bool_input1, :bool_input2], :outputs)
+    outputs([:gate_or_null])
   end
 
   @doc """
-  Complex genotype with medium probability of success.
+  Complex genotype with medium probability of success
   """
-  defgenotype "complex_gate" do
-    architecture(:complex)
-    actuators([:gate_score])
-    sensors([:bool_input1, :bool_input2])
+  genotype "complex_gate" do
+    inputs([:bool_input1, :bool_input2], :hidden1)
+    outputs([:gate_score])
+
+    layers(%{
+      hidden1: :layer.dense(3, %{hidden1: :sequential}),
+      hidden2: :layer.dense(3, %{outputs: :sequential})
+    })
   end
 end

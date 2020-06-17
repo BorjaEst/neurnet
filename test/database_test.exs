@@ -52,29 +52,81 @@ defmodule DatabaseTest do
     assert is_function(s2.function)
   end
 
-  test "Load test_architectures architectures" do
-    {:atomic, _} = Database.run(fn -> Architecture.load(TestArchitectures) end)
-
-    {:atomic, a1} = Database.run(fn -> Database.read!(:simple, :architecture) end)
-    assert a1.dim == [2]
-    assert a1.type == :sequential
-
-    {:atomic, a2} = Database.run(fn -> Database.read!(:complex, :architecture) end)
-    assert a2.dim == [3, 3]
-    assert a2.type == :recurrent
-  end
-
   test "Load test_genotypes genotypes" do
     {:atomic, _} = Database.run(fn -> Genotype.load(TestGenotypes) end)
 
     {:atomic, g1} = Database.run(fn -> Database.read!(:dummy_gate, :genotype) end)
-    assert g1.architecture == :simple
     assert g1.actuators == [:gate_or_null]
     assert g1.sensors == [:bool_input1, :bool_input2]
 
+    assert g1.model == %{
+             inputs: %{
+               connections: %{outputs: :sequential},
+               data: %{
+                 activation: :direct,
+                 aggregation: :direct,
+                 bias: 0.0,
+                 initializer: :ones
+               },
+               units: 2
+             },
+             outputs: %{
+               connections: %{},
+               data: %{
+                 activation: :direct,
+                 aggregation: :dot_prod,
+                 bias: 0.0,
+                 initializer: :glorot
+               },
+               units: 1
+             }
+           }
+
     {:atomic, g2} = Database.run(fn -> Database.read!(:complex_gate, :genotype) end)
-    assert g2.architecture == :complex
     assert g2.actuators == [:gate_score]
     assert g2.sensors == [:bool_input1, :bool_input2]
+
+    assert g2.model == %{
+             hidden1: %{
+               units: 3,
+               connections: %{hidden1: :sequential},
+               data: %{
+                 activation: :direct,
+                 aggregation: :dot_prod,
+                 bias: :not_init,
+                 initializer: :glorot
+               }
+             },
+             hidden2: %{
+               units: 3,
+               connections: %{outputs: :sequential},
+               data: %{
+                 activation: :direct,
+                 aggregation: :dot_prod,
+                 bias: :not_init,
+                 initializer: :glorot
+               }
+             },
+             inputs: %{
+               units: 2,
+               connections: %{hidden1: :sequential},
+               data: %{
+                 activation: :direct,
+                 aggregation: :direct,
+                 bias: 0.0,
+                 initializer: :ones
+               }
+             },
+             outputs: %{
+               units: 1,
+               connections: %{},
+               data: %{
+                 activation: :direct,
+                 aggregation: :dot_prod,
+                 bias: 0.0,
+                 initializer: :glorot
+               }
+             }
+           }
   end
 end

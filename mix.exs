@@ -24,9 +24,11 @@ defmodule Neurnet.MixProject do
     [
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
-      {:datalog, git: "git://github.com/BorjaEst/datalog.git", branch: "master"},
+      {:jiffy, git: "git://github.com/aboroska/jiffy.git", branch: "rebar3", override: true},
+      {:datalog, git: "git://github.com/BorjaEst/datalog.git", branch: "jiffy-rebar3", override: true},
       {:numerl, git: "git://github.com/BorjaEst/numerl.git", branch: "master"},
-      {:enn, git: "git://github.com/BorjaEst/enn.git", branch: "master"},
+      {:enn, git: "git://github.com/BorjaEst/enn.git", branch: "nnet_split"},
+      {:nnet, git: "git://github.com/BorjaEst/nnet.git", branch: "master"},
       {:eevo, git: "git://github.com/BorjaEst/eevo.git", branch: "master"}
     ]
   end

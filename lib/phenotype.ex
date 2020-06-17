@@ -13,26 +13,28 @@ defmodule Phenotype do
   @spec fields() :: [atom()]
   def fields(), do: Map.from_struct(%Phenotype{}) |> Map.keys()
 
-  @doc """
-  Clones a phenotype
-  """
-  @spec from(%Phenotype{}) :: %Phenotype{}
-  def clone(%Phenotype{} = phenotype) do
-    %{phenotype | id: Database.id(:phenotype)}
-    %{phenotype | network: :enn.clone(phenotype.network)}
-  end
-
-  @doc """
+    @doc """
   Builds a phenotype from a genotype
   """
   @spec from(%Genotype{}) :: %Phenotype{}
   def from(%Genotype{} = genotype) do
+    {:atomic, network} = :enn.compile(genotype.model)
     %Phenotype{
       id: Database.id(:phenotype),
-      network: :enn.compile(model(genotype)),
+      network: network,
       actuators: select(genotype.actuators),
       sensors: select(genotype.sensors)
     }
+  end
+
+  @doc """
+  Clones a phenotype
+  """
+  @spec clone(%Phenotype{}) :: %Phenotype{}
+  def clone(%Phenotype{} = phenotype) do
+    {:atomic, clone} = :enn.clone(phenotype.network)
+    new_id = Database.id(:phenotype)
+    %Phenotype{phenotype | id: new_id, network: clone}
   end
 
   @doc """
@@ -41,7 +43,7 @@ defmodule Phenotype do
   @spec mutate(%Phenotype{}) :: %Phenotype{}
   def mutate(%Phenotype{} = phenotype) do
     %Phenotype{
-      network: Architecture.mutate(phenotype.network),
+      network: Network.mutate(phenotype.network),
       actuators: for(x <- phenotype.actuators, do: Actuator.mutate(x)),
       sensors: for(x <- phenotype.sensors, do: Sensor.mutate(x))
     }
@@ -125,14 +127,6 @@ defmodule Phenotype do
   ### =================================================================
   ###  Internal functions
   ### =================================================================
-
-  defp model(%Genotype{} = genotype) do
-    architecture = Database.dirty_read!(genotype.architecture, :architecture)
-    inputs = :layer.input(length(genotype.sensors))
-    hidden = Enum.map(architecture.dim, fn n -> :layer.dense(n) end)
-    outputs = :layer.output(length(genotype.actuators))
-    apply(:model, architecture.type, [[inputs] ++ hidden ++ [outputs]])
-  end
 
   defp select(groups) when is_list(groups) do
     for g_id <- groups, do: select(g_id)

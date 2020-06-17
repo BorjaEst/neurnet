@@ -6,13 +6,11 @@ defmodule Neurnet.Application do
   use Application
 
   def start(_type, _args) do
-    true = Database.new_table(:actuator)
-    true = Database.new_table(:architecture)
-    true = Database.new_table(:genotype)
     true = Database.new_table(:group)
-    true = Database.new_table(:phenotype)
+    true = Database.new_table(:actuator)
     true = Database.new_table(:sensor)
-    true = Database.new_table(:test)
+    true = Database.new_table(:genotype)
+    true = Database.new_table(:phenotype)
 
     children = [
       # Starts a worker by calling: Neurnet.Worker.start_link(arg)
