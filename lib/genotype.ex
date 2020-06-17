@@ -1,7 +1,7 @@
 defmodule Genotype do
   @moduledoc """
   """
-  defstruct id: nil, architecture: nil, actuators: [], sensors: []
+  defstruct id: nil, model: nil, actuators: [], sensors: []
 
   @doc false
   defmacro __using__(_opts) do
@@ -27,53 +27,59 @@ defmodule Genotype do
   @doc """
   Defines a new genotype
   """
-  defmacro defgenotype(name, do: block) do
+  defmacro genotype(name, do: block) do
     genotype_name = String.to_atom(name)
-    var_genotype = Macro.var(:genotype, nil)
-
-    def_genotype =
-      Macro.escape(%Genotype{
-        id: Database.id(genotype_name, :genotype)
-      })
+    var_genotype = Macro.var(:v_genotype, nil)
+    var_model = Macro.var(:v_model, nil)
 
     quote do
       @genotypes [unquote(genotype_name) | @genotypes]
       @spec unquote(genotype_name)() :: Genotype.t()
       def unquote(genotype_name)() do
-        unquote(var_genotype) = unquote(def_genotype)
+        unquote(var_genotype) = Genotype.new(unquote(genotype_name))
+        unquote(var_model) = Genotype.empty_map()
         unquote(block)
-        unquote(var_genotype)
+        Map.put(var!(v_genotype), :model, var!(v_model))
       end
     end
   end
 
-  @doc """
-  Defines the architecture for a genotype. Should be placed inside
-  a defgenotype ... end instance
-  """
-  defmacro architecture(name) do
-    quote do
-      var!(genotype) = Map.put(var!(genotype), :architecture, unquote(name))
-    end
-  end
-
-  @doc """
-  Defines the actuators for a genotype. Should be placed inside
-  a defgenotype ... end instance
-  """
-  defmacro actuators(name) do
-    quote do
-      var!(genotype) = Map.put(var!(genotype), :actuators, unquote(name))
-    end
-  end
+  def new(name), do: %Genotype{id: Database.id(name, :genotype)}
+  def empty_map(), do: %{}
 
   @doc """
   Defines the sensors for a genotype. Should be placed inside
   a defgenotype ... end instance
   """
-  defmacro sensors(name) do
+  defmacro inputs(list, next) do
     quote do
-      var!(genotype) = Map.put(var!(genotype), :sensors, unquote(name))
+      var!(v_genotype) = Map.put(var!(v_genotype), :sensors, unquote(list))
+      var!(v_model) = Map.merge(var!(v_model), Genotype.din(unquote(list), unquote(next)))
+    end
+  end
+
+  def din(l, n), do: %{inputs: :layer.input(length(l), %{n => :sequential})}
+
+  @doc """
+  Defines the actuators for a genotype. Should be placed inside
+  a defgenotype ... end instance
+  """
+  defmacro outputs(list) do
+    quote do
+      var!(v_genotype) = Map.put(var!(v_genotype), :actuators, unquote(list))
+      var!(v_model) = Map.merge(var!(v_model), Genotype.dout(unquote(list)))
+    end
+  end
+
+  def dout(list), do: %{outputs: :layer.output(length(list), %{})}
+
+  @doc """
+  Defines the architecture for a genotype. Should be placed inside
+  a defgenotype ... end instance
+  """
+  defmacro layers(lmap) do
+    quote do
+      var!(v_model) = Map.merge(var!(v_model), unquote(lmap))
     end
   end
 
@@ -97,7 +103,6 @@ defmodule Genotype do
   end
 
   def load(module) do
-    _ = Architecture.load(module.architectures())
     _ = Actuator.load(module.actuators())
     _ = Sensor.load(module.sensors())
 
