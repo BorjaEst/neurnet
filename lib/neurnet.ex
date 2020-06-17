@@ -30,6 +30,14 @@ defmodule Neurnet do
   end
 
   @doc """
+  Returns the phenotype information.
+  """
+  @spec info(phenotype()) :: %Phenotype{}
+  def info({_, :phenotype} = id) do
+    Database.dirty_read!(id, :phenotype)
+  end
+
+  @doc """
   Creates an eevo agent from a phenotype to run in a population.
   """
   @spec agent_from(phenotype()) :: :agent.id()
