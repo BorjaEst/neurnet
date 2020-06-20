@@ -1,7 +1,7 @@
 defmodule Phenotype do
   @moduledoc """
   """
-  defstruct id: nil, network: nil, actuators: [], sensors: []
+  defstruct network: nil, actuators: [], sensors: []
 
   ### =================================================================
   ###  API
@@ -13,14 +13,14 @@ defmodule Phenotype do
   @spec fields() :: [atom()]
   def fields(), do: Map.from_struct(%Phenotype{}) |> Map.keys()
 
-    @doc """
+  @doc """
   Builds a phenotype from a genotype
   """
   @spec from(%Genotype{}) :: %Phenotype{}
   def from(%Genotype{} = genotype) do
     {:atomic, network} = :enn.compile(genotype.model)
+
     %Phenotype{
-      id: Database.id(:phenotype),
       network: network,
       actuators: select(genotype.actuators),
       sensors: select(genotype.sensors)
@@ -33,8 +33,7 @@ defmodule Phenotype do
   @spec clone(%Phenotype{}) :: %Phenotype{}
   def clone(%Phenotype{} = phenotype) do
     {:atomic, clone} = :enn.clone(phenotype.network)
-    new_id = Database.id(:phenotype)
-    %Phenotype{phenotype | id: new_id, network: clone}
+    %Phenotype{phenotype | network: clone}
   end
 
   @doc """
@@ -53,19 +52,18 @@ defmodule Phenotype do
   ### Phenotype callbacks
   ### =================================================================
 
-  @spec controller(Database.id()) :: :eevo.agent_return()
+  @spec controller(%Phenotype{}) :: :eevo.agent_return()
   @doc """
   Starts the phenotype loop
   """
-  def controller(phenotype_id) do
-    phenotype = Database.dirty_read!(phenotype_id)
+  def controller(%Phenotype{} = phenotype) do
     :enn.start(phenotype.network)
     :enn.link(phenotype.network)
 
     state = %{
       cortex: :enn.cortex(phenotype.network),
-      actuators: for(x <- phenotype.actuators, do: Database.dirty_read!(x, :actuator)),
-      sensors: for(x <- phenotype.sensors, do: Database.dirty_read!(x, :sensor)),
+      actuators: for(x <- phenotype.actuators, do: Database.dirty_read!({:actuator, x})),
+      sensors: for(x <- phenotype.sensors, do: Database.dirty_read!({:sensor, x})),
       data: %{}
     }
 
@@ -129,11 +127,11 @@ defmodule Phenotype do
   ### =================================================================
 
   defp select(groups) when is_list(groups) do
-    for g_id <- groups, do: select(g_id)
+    for name <- groups, do: select(name)
   end
 
-  defp select(g_id) do
-    group = Database.dirty_read!(g_id, :group)
+  defp select(name) do
+    group = Database.dirty_read!({:group, name})
     Enum.random(group.members)
   end
 end
