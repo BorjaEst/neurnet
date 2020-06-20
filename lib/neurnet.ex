@@ -3,8 +3,8 @@ defmodule Neurnet do
   Documentation for `Neurnet`.
   """
 
-  @type genotype :: atom()
-  @type phenotype :: Phenotype.id()
+  @type genotype() :: atom()
+  @type phenotype() :: :agent.id()
 
   ### =================================================================
   ###  API
@@ -21,48 +21,24 @@ defmodule Neurnet do
   @doc """
   Creates a phenotype from a genotype.
   """
-  @spec phenotype_from(genotype) :: :agent.id()
-  def phenotype_from(genotype) do
-    genotype
-    |> Database.dirty_read!(:genotype)
-    |> Phenotype.from()
-    |> Database.dirty_write(:phenotype)
+  @spec phenotype_from(genotype()) :: phenotype()
+  def phenotype_from(name) do
+    genotype = Database.dirty_read!({:genotype, name})
+
+    :eevo.agent(%{
+      function: &Phenotype.controller/1,
+      mutation: &Phenotype.mutate/1,
+      arguments: [Phenotype.from(genotype)]
+    })
   end
 
   @doc """
   Returns the phenotype information.
   """
   @spec info(phenotype()) :: %Phenotype{}
-  def info({_, :phenotype} = id) do
-    Database.dirty_read!(id, :phenotype)
-  end
-
-  @doc """
-  Creates an eevo agent from a phenotype to run in a population.
-  """
-  @spec agent_from(phenotype()) :: :agent.id()
-  def agent_from(phenotype_id) do
-    :eevo.agent(%{
-      function: &Phenotype.controller/1,
-      mutation: &Neurnet.mutate/1,
-      arguments: [phenotype_id]
-    })
-  end
-
-  @doc """
-  Mutates a list of phenotypes returning their childs id
-  """
-  @spec mutate([phenotype()]) :: phenotype()
-  def mutate(list) when is_list(list) do
-    Enum.map(list, &mutate/1)
-  end
-
-  def mutate({reference, :phenotype}) do
-    reference
-    |> Database.dirty_read!(:phenotype)
-    |> Phenotype.clone()
-    |> Phenotype.mutate()
-    |> Database.dirty_write(:phenotype)
+  def info(agent_id) do
+    %{arguments: [phenotype]} = :eevo.info(agent_id)
+    phenotype
   end
 
   @doc """
@@ -71,8 +47,7 @@ defmodule Neurnet do
   @spec run(atom(), genotype(), number(), function()) :: :eevo.results()
   def run(name, genotype, parallel, stop_condition) do
     phenotypes = for _ <- 1..parallel, do: phenotype_from(genotype)
-    agents = for p <- phenotypes, do: agent_from(p)
-    :eevo.run(name, agents, parallel, stop_condition)
+    :eevo.run(name, phenotypes, parallel, stop_condition)
   end
 
   ### =================================================================
