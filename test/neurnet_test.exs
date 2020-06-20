@@ -8,27 +8,23 @@ defmodule NeurnetTest do
   end
 
   test "Phenotype from genotype" do
-    id = Neurnet.phenotype_from(:dummy_gate)
-    phenotype = Database.dirty_read!(id)
+    phenotype = Neurnet.phenotype_from(:dummy_gate)
+    ph_struct = Neurnet.info(phenotype)
 
-    assert [] == phenotype.actuators -- [:xor_score, :null]
-    assert [] == phenotype.sensors -- [:seq_1, :seq_2]
-    {:atomic, info} = :enn.info(phenotype.network)
-    assert 2 == length(info.inputs)
-    assert 1 == length(info.outputs)
-    assert 3 == map_size(info.nnodes)
+    assert [] == ph_struct.actuators -- [:xor_score, :null]
+    assert [] == ph_struct.sensors -- [:seq_1, :seq_2]
+    assert :network == elem(ph_struct.network, 0)
   end
 
   test "Phenotype mutation" do
-    phenotype_1 = Neurnet.phenotype_from(:dummy_gate)
-    phenotype_2 = Neurnet.mutate(phenotype_1)
-    phenotype_1 = Database.dirty_read!(phenotype_1)
-    phenotype_2 = Database.dirty_read!(phenotype_2)
+    phenotype = Neurnet.phenotype_from(:dummy_gate)
+    ph1_struct = Neurnet.info(phenotype)
+    ph2_struct = Phenotype.mutate(phenotype)
 
-    assert phenotype_1 != phenotype_2
-    assert [] == phenotype_2.actuators -- [:xor_score, :null]
-    assert phenotype_1.sensors == phenotype_2.sensors
-    assert phenotype_1.network != phenotype_2.network
+    assert ph1_struct != ph1_struct
+    assert [] == ph1_struct.actuators -- [:xor_score, :null]
+    assert ph1_struct.sensors == ph1_struct.sensors
+    assert ph1_struct.network != ph1_struct.network
   end
 
   # test "Run training of dummy gate" do
