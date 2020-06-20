@@ -34,7 +34,7 @@ defmodule Neurnet do
   """
   @spec info(phenotype()) :: %Phenotype{}
   def info({_, :phenotype} = id) do
-    Database.dirty_read!(id, :phenotype)
+    Database.dirty_read!(id)
   end
 
   @doc """

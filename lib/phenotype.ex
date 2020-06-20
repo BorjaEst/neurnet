@@ -2,6 +2,7 @@ defmodule Phenotype do
   @moduledoc """
   """
   defstruct id: nil, network: nil, actuators: [], sensors: []
+  require Logger
 
   ### =================================================================
   ###  API
@@ -53,16 +54,18 @@ defmodule Phenotype do
   ### Phenotype callbacks
   ### =================================================================
 
-  @spec controller(Database.id()) :: :eevo.agent_return()
   @doc """
   Starts the phenotype loop
   """
+  @spec controller(Database.id()) :: :eevo.agent_return()
   def controller(phenotype_id) do
     phenotype = Database.dirty_read!(phenotype_id)
+    Logger.debug("Starting phenotype: #{inspect(phenotype)}")
     :enn.start(phenotype.network)
     :enn.link(phenotype.network)
 
     state = %{
+      network: phenotype.network,
       cortex: :enn.cortex(phenotype.network),
       actuators: for(x <- phenotype.actuators, do: Database.dirty_read!(x, :actuator)),
       sensors: for(x <- phenotype.sensors, do: Database.dirty_read!(x, :sensor)),
@@ -85,7 +88,7 @@ defmodule Phenotype do
         run_sensors([signal | signals], sx, %{state | data: data})
 
       {:stop, reason} ->
-        {:stop, reason}
+        terminate(reason, [], state)
     end
   end
 
@@ -112,10 +115,10 @@ defmodule Phenotype do
         run_actuators([err | errs], s_acc, px, ax, %{state | data: data})
 
       {:stop, reason} ->
-        {:stop, reason, []}
+        terminate(reason, [], state)
 
       {:stop, reason, score} ->
-        {:stop, reason, [{:score, score}]}
+        terminate(reason, [{:score, score + s_acc}], state)
     end
   end
 
@@ -123,6 +126,15 @@ defmodule Phenotype do
     _bp_errors = :cortex.fit(state.cortex, errors)
     {:next, &enter_sensors/1, [state], [{:score, score_acc}]}
   end
+
+  @doc """
+  Terminates the
+  """
+  def terminate(reason, actions, state) do
+    :enn.stop(state.network)
+    {:stop, reason, actions}
+  end
+
 
   ### =================================================================
   ###  Internal functions
