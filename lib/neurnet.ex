@@ -24,6 +24,7 @@ defmodule Neurnet do
   @spec phenotype_from(genotype()) :: phenotype()
   def phenotype_from(name) do
     genotype = Database.dirty_read!({:genotype, name})
+
     :eevo.agent(%{
       function: &Phenotype.controller/1,
       mutation: &Phenotype.mutate/1,

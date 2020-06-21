@@ -17,9 +17,10 @@ defmodule NeurnetTest do
   end
 
   test "Phenotype mutation" do
-    phenotype = Neurnet.phenotype_from(:dummy_gate)
-    ph1_struct = Neurnet.info(phenotype)
-    ph2_struct = Phenotype.mutate(phenotype)
+    phenotype_1 = Neurnet.phenotype_from(:dummy_gate)
+    ph1_struct = Neurnet.info(phenotype_1)
+    phenotype_2 = :eevo.mutate(phenotype_1)
+    ph2_struct = Neurnet.info(phenotype_2)
 
     assert ph1_struct != ph1_struct
     assert [] == ph1_struct.actuators -- [:xor_score, :null]

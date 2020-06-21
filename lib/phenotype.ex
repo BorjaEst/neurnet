@@ -60,7 +60,8 @@ defmodule Phenotype do
   def controller(%Phenotype{} = phenotype) do
     :enn.start(phenotype.network)
     :enn.link(phenotype.network)
-    Logger.debug("Starting phenotype: #{inspect(phenotype)}"
+    Logger.debug("Starting phenotype: #{inspect(phenotype)}")
+
     state = %{
       network: phenotype.network,
       cortex: :enn.cortex(phenotype.network),
@@ -131,7 +132,6 @@ defmodule Phenotype do
     :enn.stop(state.network)
     {:stop, reason, actions}
   end
-
 
   ### =================================================================
   ###  Internal functions
