@@ -10,7 +10,6 @@ defmodule Neurnet.Application do
     true = Database.new_table(:actuator)
     true = Database.new_table(:sensor)
     true = Database.new_table(:genotype)
-    true = Database.new_table(:phenotype)
 
     children = [
       # Starts a worker by calling: Neurnet.Worker.start_link(arg)

@@ -1,7 +1,7 @@
 defmodule Genotype do
   @moduledoc """
   """
-  defstruct id: nil, model: nil, actuators: [], sensors: []
+  defstruct model: nil, actuators: [], sensors: []
 
   @doc false
   defmacro __using__(_opts) do
@@ -36,7 +36,7 @@ defmodule Genotype do
       @genotypes [unquote(genotype_name) | @genotypes]
       @spec unquote(genotype_name)() :: Genotype.t()
       def unquote(genotype_name)() do
-        unquote(var_genotype) = Genotype.new(unquote(genotype_name))
+        unquote(var_genotype) = Genotype.new()
         unquote(var_model) = Genotype.empty_map()
         unquote(block)
         Map.put(var!(v_genotype), :model, var!(v_model))
@@ -44,7 +44,7 @@ defmodule Genotype do
     end
   end
 
-  def new(name), do: %Genotype{id: Database.id(name, :genotype)}
+  def new(), do: %Genotype{}
   def empty_map(), do: %{}
 
   @doc """
@@ -108,7 +108,7 @@ defmodule Genotype do
 
     for name <- module.genotypes do
       genotype = %Genotype{} = apply(module, name, [])
-      Database.write(genotype)
+      Database.new(:genotype, name, genotype)
       name
     end
   end

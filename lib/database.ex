@@ -1,10 +1,9 @@
 defmodule Database do
   @moduledoc """
   """
-  @type tname :: atom
-  @type id :: {term, tname}
-  @type entry :: %{required(:id) => id, optional(term) => term}
-  @type operations :: function
+  @type key() :: term()
+  @type tname() :: atom()
+  @type id() :: {tname(), key()}
   @attributes [:id, :data]
 
   ### =================================================================
@@ -24,91 +23,92 @@ defmodule Database do
   end
 
   @doc """
-  Creates entry id
-  """
-  @spec id(tname) :: id
-  def id(tname), do: {make_ref(), tname}
-
-  @spec id(term, tname) :: id
-  def id(ref, tname), do: {ref, tname}
-
-  @doc """
-  Writes data in mnesia.
-  Should run inside :mnesia transaction (or run/1)
-  """
-  @spec write(entry) :: id
-  def write(%{:id => {_, tname}} = data) do
-    :ok = :mnesia.write({tname, data.id, data})
-    data.id
-  end
-
-  @spec write(term, tname) :: id
-  def write(data, tname) do
-    id = id(tname)
-    :ok = :mnesia.write({tname, id, data})
-    id
-  end
-
-  @doc """
-  Reads data from mnesia
-  Should run inside :mnesia transaction (or run/1)
-  """
-  @spec read!(id) :: term
-  def read!({_, tname} = id) do
-    case :mnesia.read(tname, id) do
-      [{^tname, _, data}] -> data
-      [] -> raise "not found #{id}"
-    end
-  end
-
-  @spec read!(term, tname) :: term
-  def read!(ref, tname) do
-    case :mnesia.read(tname, id(ref, tname)) do
-      [{^tname, _, data}] -> data
-      [] -> raise "not found #{ref} in table #{tname}"
-    end
-  end
-
-  @doc """
   Executes the mnesia transactions
   """
-  @spec run(operations) :: {:aborted, any} | {:atomic, any}
+  @spec run(function()) :: {:aborted, any} | {:atomic, any}
   def run(operations) do
     :mnesia.transaction(operations)
   end
 
   @doc """
-  Dirty data write in mnesia.
+  Writes new data in mnesia.
+  Should run inside :mnesia transaction (or run/1)
   """
-  @spec dirty_write(entry) :: id
-  def dirty_write(%{:id => {_, tname}} = data) do
-    :ok = :mnesia.dirty_write({tname, data.id, data})
-    data.id
+  @spec new(tname(), term()) :: id()
+  def new(tname, data) do
+    key = make_ref()
+    :ok = :mnesia.write({tname, key, data})
+    {tname, key}
   end
 
-  @spec dirty_write(term, tname) :: id
-  def dirty_write(data, tname) do
-    id = id(tname)
-    :ok = :mnesia.dirty_write({tname, id, data})
-    id
+  @spec new(tname(), key(), term()) :: id()
+  def new(tname, key, data) do
+    :ok = :mnesia.write({tname, key, data})
+    {tname, key}
+  end
+
+  @doc """
+  Writes new data in mnesia.
+  Should run inside :mnesia transaction (or run/1)
+  """
+  @spec dirty_new(tname(), term()) :: id()
+  def dirty_new(tname, data) do
+    key = make_ref()
+    :ok = :mnesia.dirty_write({tname, key, data})
+    {tname, key}
+  end
+
+  @doc """
+  Reads data from mnesia.
+  Should run inside :mnesia transaction (or run/1)
+  """
+  @spec read!(id()) :: term()
+  def read!({tname, key}) do
+    case :mnesia.read(tname, key) do
+      [{_, _, data}] -> data
+      [] -> raise "not found '#{key}' in table '#{tname}'"
+    end
   end
 
   @doc """
   Dirty data read from mnesia
   """
   @spec dirty_read!(id) :: term
-  def dirty_read!({_, tname} = id) do
-    case :mnesia.dirty_read(tname, id) do
-      [{^tname, _, data}] -> data
-      [] -> raise "not found #{id}"
+  def dirty_read!({tname, key}) do
+    case :mnesia.dirty_read(tname, key) do
+      [{_, _, data}] -> data
+      [] -> raise "not found '#{key}' in table '#{tname}'"
     end
   end
 
-  @spec dirty_read!(term, tname) :: term
-  def dirty_read!(ref, tname) do
-    case :mnesia.dirty_read(tname, id(ref, tname)) do
-      [{^tname, _, data}] -> data
-      [] -> raise "not found #{ref} in table #{tname}"
+  @doc """
+  Overwrites data in mnesia.
+  Should run inside :mnesia transaction (or run/1)
+  """
+  @spec write(id(), term()) :: term()
+  def write({tname, key}, data) do
+    :ok = :mnesia.write({tname, key, data})
+    {tname, key}
+  end
+
+  @doc """
+  Dirty data write in mnesia.
+  """
+  @spec dirty_write(id(), term()) :: term()
+  def dirty_write({tname, key}, data) do
+    :ok = :mnesia.dirty_write({tname, key, data})
+    {tname, key}
+  end
+
+  @doc """
+  Updates an id data with using function data from mnesia.
+  Should run inside :mnesia transaction (or run/1)
+  """
+  @spec updt!(id(), function()) :: term()
+  def updt!({tname, key} = id, fun) do
+    case :mnesia.wread({tname, key}) do
+      [{_, _, data}] -> write(id, fun.(data))
+      [] -> raise "not found #{id}"
     end
   end
 

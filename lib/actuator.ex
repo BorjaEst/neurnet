@@ -1,7 +1,7 @@
 defmodule Actuator do
   @moduledoc """
   """
-  defstruct id: nil, function: nil, evolution: []
+  defstruct function: nil, evolution: []
 
   @type data() :: map()
   @type score() :: number()
@@ -12,8 +12,6 @@ defmodule Actuator do
           | {:ok, error(), score(), data()}
           | {:stop, reason()}
           | {:stop, reason(), score()}
-
-  defmacro actuator_id(name), do: Database.id(name, :actuator)
 
   ### =================================================================
   ###  API
@@ -35,10 +33,11 @@ defmodule Actuator do
   end
 
   def load(module) do
-    actuators = Group.load(module) |> from_groups()
+    groups = Group.load(module)
+    actuators = :lists.append(for g <- groups, do: Group.members(g))
 
-    for name <- actuators do
-      Database.write(new_actuator(name, module))
+    for name <- Enum.uniq(actuators) do
+      Database.new(:actuator, name, new(name, module))
     end
   end
 
@@ -47,7 +46,7 @@ defmodule Actuator do
   """
   @spec mutate(atom) :: atom
   def mutate(name) do
-    actuator = Database.dirty_read!(name, :actuator)
+    actuator = Database.read!({:actuator, name})
 
     case :ltools.rand_scale(actuator.evolution) do
       {} -> name
@@ -68,22 +67,10 @@ defmodule Actuator do
   ### =================================================================
 
   # Creates an actuator with the defined id and function ------------
-  defp new_actuator(function_name, module) do
+  defp new(function_name, module) do
     %Actuator{
-      id: actuator_id(function_name),
       function: Function.capture(module, function_name, 2),
       evolution: apply(module, function_name, [])
     }
   end
-
-  # Adds the group members to a set ---------------------------------
-  defp from_groups(groups) do
-    from_groups(MapSet.new(), groups) |> MapSet.to_list()
-  end
-
-  defp from_groups(set, [%Group{} = group | groups]) do
-    MapSet.union(set, group.members) |> from_groups(groups)
-  end
-
-  defp from_groups(set, []), do: set
 end
