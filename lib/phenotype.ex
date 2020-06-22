@@ -19,7 +19,7 @@ defmodule Phenotype do
   """
   @spec from(%Genotype{}) :: %Phenotype{}
   def from(%Genotype{} = genotype) do
-    {:atomic, network} = :enn.compile(genotype.model)
+    {:atomic, network} = :mnesia.transaction(fn -> :enn.compile(genotype.model) end)
 
     %Phenotype{
       network: network,
@@ -29,24 +29,20 @@ defmodule Phenotype do
   end
 
   @doc """
-  Clones a phenotype
-  """
-  @spec clone(%Phenotype{}) :: %Phenotype{}
-  def clone(%Phenotype{} = phenotype) do
-    {:atomic, clone} = :enn.clone(phenotype.network)
-    %Phenotype{phenotype | network: clone}
-  end
-
-  @doc """
   Mutates the phenotype modifying the network, sensors and actuators
   """
-  @spec mutate(%Phenotype{}) :: %Phenotype{}
-  def mutate(%Phenotype{} = phenotype) do
-    %Phenotype{
-      network: Network.mutate(phenotype.network),
-      actuators: for(x <- phenotype.actuators, do: Actuator.mutate(x)),
-      sensors: for(x <- phenotype.sensors, do: Sensor.mutate(x))
-    }
+  @spec mutate(%Phenotype{}) :: [%Phenotype{}]
+  def mutate(%Phenotype{} = original) do
+    {:atomic, mutated} =
+      :mnesia.transaction(fn ->
+        %Phenotype{
+          network: Network.mutate(original.network),
+          actuators: for(x <- original.actuators, do: Actuator.mutate(x)),
+          sensors: for(x <- original.sensors, do: Sensor.mutate(x))
+        }
+      end)
+
+    [mutated]
   end
 
   ### =================================================================

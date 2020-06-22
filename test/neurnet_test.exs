@@ -22,10 +22,10 @@ defmodule NeurnetTest do
     phenotype_2 = :eevo.mutate(phenotype_1)
     ph2_struct = Neurnet.info(phenotype_2)
 
-    assert ph1_struct != ph1_struct
-    assert [] == ph1_struct.actuators -- [:xor_score, :null]
-    assert ph1_struct.sensors == ph1_struct.sensors
-    assert ph1_struct.network != ph1_struct.network
+    assert ph1_struct != ph2_struct
+    assert [] == ph2_struct.actuators -- [:xor_score, :null]
+    assert ph1_struct.sensors == ph2_struct.sensors
+    assert ph1_struct.network != ph2_struct.network
   end
 
   # test "Run training of dummy gate" do

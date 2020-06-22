@@ -4,7 +4,7 @@ defmodule Neurnet do
   """
 
   @type genotype() :: atom()
-  @type phenotype() :: :agent.id()
+  @type phenotype() :: :eevo.agent()
 
   ### =================================================================
   ###  API
@@ -35,10 +35,10 @@ defmodule Neurnet do
   @doc """
   Returns the phenotype information.
   """
-  @spec info(phenotype()) :: %Phenotype{}
-  def info(agent_id) do
-    %{arguments: [phenotype]} = :eevo.info(agent_id)
-    phenotype
+  @spec info(phenotype()) :: phenotype()
+  def info(phenotype) do
+    %{arguments: [struct]} = :eevo.info(phenotype)
+    struct
   end
 
   @doc """

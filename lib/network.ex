@@ -10,17 +10,14 @@ defmodule Network do
   Mutates the neuronal network
   """
   @spec mutate(:enn.network()) :: :enn.network()
-  def mutate(network) do
-    {:atomic, _} = :nnet.edit(fn -> mutate_network(network) end)
-    network
-  end
+  def mutate({:network, _} = network), do: mutate_network(network)
 
   @doc """
-  Mutates the neuronal network. Should run inside :nnet.edit/1
+  Mutates the neuronal network. Should run inside mnesia transaction.
   """
   @spec mutate_network(:enn.network()) :: :enn.network()
-  def mutate_network({:network, _} = network) do
-    network
+  def mutate_network(network) do
+    :nnet.clone(network)
     |> maybe_divide_neuron
     |> maybe_del_connections
     |> maybe_add_connections
@@ -48,10 +45,10 @@ defmodule Network do
   end
 
   @doc """
-  Mutates the neuron. Should run inside :nnet.edit/1
+  Mutates the neuron. Should run inside mnesia transaction.
   """
   @spec mutate_neuron(:enn.neuron()) :: :enn.neuron()
-  def mutate_neuron({:nnode, _} = neuron) do
+  def mutate_neuron(neuron) do
     neuron
     |> maybe_reinitialise_bias
     |> maybe_switch_activation
