@@ -86,7 +86,7 @@ defmodule DatabaseTest do
     assert g2.model == %{
              hidden1: %{
                units: 3,
-               connections: %{hidden1: :sequential},
+               connections: %{hidden2: :sequential},
                data: %{
                  activation: :direct,
                  aggregation: :dot_prod,
