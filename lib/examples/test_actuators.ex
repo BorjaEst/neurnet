@@ -33,7 +33,7 @@ defmodule TestActuators do
 
   @spec xor_score(number, map) :: Actuator.result()
   def xor_score(signal, state) do
-    error = signal - num_xor(state.i1, state.i2)
+    error = num_xor(state.i1, state.i2) - signal
     {:ok, error, score(error), state}
   end
 
