@@ -31,16 +31,32 @@ defmodule TestActuators do
   """
   def xor_score(), do: []
 
+  @train_cycles 100
+  @test_cycles 4
   @spec xor_score(number, map) :: Actuator.result()
-  def xor_score(signal, state) do
+  def xor_score(signal, %{cycle: cycle} = state) do
     error = num_xor(state.i1, state.i2) - signal
-    {:ok, error, score(error), state}
+
+    cond do
+      cycle <= @train_cycles ->
+        {:ok, error, 0.0, %{state | cycle: cycle + 1}}
+
+      cycle < @test_cycles + @train_cycles ->
+        {:ok, error, score(error), %{state | cycle: cycle + 1}}
+
+      true ->
+        {:stop, :normal, score(error)}
+    end
+  end
+
+  def xor_score(signal, %{} = state) do
+    xor_score(signal, Map.put(state, :cycle, 1))
   end
 
   @doc """
   This does nothing (to deactivate actuator).
   """
-  def null(), do: [{:xor_score, 0.1}]
+  def null(), do: [{:xor_score, 0.9}]
 
   @spec null(number, map) :: Actuator.result()
   def null(_signal, state) do
@@ -60,6 +76,6 @@ defmodule TestActuators do
 
   # Scores according to the error -----------------------------------
   defp score(err) do
-    2000 - 1000 * abs(err)
+    250 - 250 * (abs(err) / 2)
   end
 end
