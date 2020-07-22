@@ -28,7 +28,7 @@ defmodule Neurnet do
     :eevo.agent(%{
       function: &Phenotype.controller/1,
       mutation: &Phenotype.mutate/1,
-      arguments: [Phenotype.from(genotype)]
+      arguments: Phenotype.from(genotype)
     })
   end
 
@@ -36,9 +36,30 @@ defmodule Neurnet do
   Returns the phenotype information.
   """
   @spec info(phenotype()) :: phenotype()
-  def info(phenotype) do
-    %{arguments: [struct]} = :eevo.info(phenotype)
-    struct
+  def info(agent) do
+    {:atomic, info} =
+      :mnesia.transaction(fn ->
+        %{arguments: [phenotype]} = :eevo.info(agent)
+
+        %{
+          actuators: phenotype.actuators,
+          sensors: phenotype.sensors,
+          network: %{
+            id: phenotype.network,
+            info: :nnet.info(phenotype.network, :out)
+          }
+        }
+      end)
+
+    info
+  end
+
+  @doc """
+  Runs a phenotypes out of a population
+  """
+  @spec run_as(phenotype()) :: {:ok, pid()}
+  def run_as(phenotype) do
+    :eevo.run_as(phenotype)
   end
 
   @doc """
@@ -47,7 +68,8 @@ defmodule Neurnet do
   @spec run(atom(), genotype(), number(), function()) :: :eevo.results()
   def run(name, genotype, parallel, stop_condition) do
     phenotypes = for _ <- 1..parallel, do: phenotype_from(genotype)
-    :eevo.run(name, phenotypes, parallel, stop_condition)
+    population = :eevo.population(name, :ramp3)
+    :eevo.run(population, phenotypes, parallel, stop_condition)
   end
 
   ### =================================================================
