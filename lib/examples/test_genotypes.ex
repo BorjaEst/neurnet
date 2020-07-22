@@ -46,4 +46,13 @@ defmodule TestGenotypes do
       hidden2: :layer.dense(3, %{outputs: :sequential})
     })
   end
+
+  @doc """
+  Complex genotype with medium probability of success
+  """
+  genotype "broken_gate" do
+    inputs([:bool_input1, :bool_input2], :hidden1)
+    outputs([:gate_score])
+    layers(%{hidden1: :layer.dense(3, %{})})
+  end
 end
