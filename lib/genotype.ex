@@ -1,6 +1,7 @@
 defmodule Genotype do
   @moduledoc """
   """
+  require Logger
   defstruct model: nil, actuators: [], sensors: []
 
   @doc false
@@ -109,6 +110,7 @@ defmodule Genotype do
     for name <- module.genotypes do
       genotype = %Genotype{} = apply(module, name, [])
       Database.new(:genotype, name, genotype)
+      Logger.debug(what: "Loaded genotype", name: name, data: genotype)
       name
     end
   end
