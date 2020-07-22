@@ -50,13 +50,13 @@ defmodule Network do
   @spec mutate_neuron(:enn.neuron()) :: :enn.neuron()
   def mutate_neuron(neuron) do
     neuron
-    |> maybe_reinitialise_bias
+    |> maybe_edit_bias
     |> maybe_switch_activation
   end
 
-  @chance 0.15
-  defp maybe_reinitialise_bias(neuron) do
-    maybe(@chance, neuron, &reinitialise_bias/1)
+  @chance 0.35
+  defp maybe_edit_bias(neuron) do
+    maybe(@chance, neuron, &edit_bias/1)
   end
 
   @chance 0.15
@@ -99,9 +99,19 @@ defmodule Network do
     Enum.map(selected, &mutate_neuron/1)
   end
 
-  # Reinitialises the bias ------------------------------------------
-  defp reinitialise_bias(neuron) do
-    :nnet.wnode(neuron, %{bias: :not_init})
+  # Edits the bias value --------------------------------------------
+  @reinitialise 0.25
+  @saturate_up 0.50
+  @saturate_down 0.75
+  @set_to_0 1.00
+  defp edit_bias(neuron) do
+    # Note max glorot value is sqrt(3) = 1.7320508075688772
+    case :rand.uniform() do
+      x when x < @reinitialise -> :nnet.wnode(neuron, %{bias: :not_init})
+      x when x < @saturate_up -> :nnet.wnode(neuron, %{bias: +1.7320508075688772})
+      x when x < @saturate_down -> :nnet.wnode(neuron, %{bias: -1.7320508075688772})
+      x when x < @set_to_0 -> :nnet.wnode(neuron, %{bias: 0.0})
+    end
   end
 
   # Randomly changes the activation ---------------------------------
