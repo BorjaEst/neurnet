@@ -17,15 +17,19 @@ defmodule Phenotype do
   @doc """
   Builds a phenotype from a genotype
   """
-  @spec from(%Genotype{}) :: %Phenotype{}
+  @spec from(%Genotype{}) :: [%Phenotype{}]
   def from(%Genotype{} = genotype) do
-    {:atomic, network} = :mnesia.transaction(fn -> :enn.compile(genotype.model) end)
+    {:atomic, phenotype} =
+      :mnesia.transaction(fn ->
+        %Phenotype{
+          network: :enn.compile(genotype.model),
+          actuators: select(genotype.actuators),
+          sensors: select(genotype.sensors)
+        }
+      end)
 
-    %Phenotype{
-      network: network,
-      actuators: select(genotype.actuators),
-      sensors: select(genotype.sensors)
-    }
+    Logger.debug(what: "New genotype from phenotype", genotype: genotype, phenotype: phenotype)
+    [phenotype]
   end
 
   @doc """
@@ -42,6 +46,7 @@ defmodule Phenotype do
         }
       end)
 
+    Logger.debug(what: "Mutation of phenotype", original: original, mutated: mutated)
     [mutated]
   end
 
@@ -54,18 +59,15 @@ defmodule Phenotype do
   Starts the phenotype loop
   """
   def controller(%Phenotype{} = phenotype) do
-    :enn.start(phenotype.network)
-    :enn.link(phenotype.network)
-    Logger.debug("Starting phenotype: #{inspect(phenotype)}")
-
     state = %{
-      network: phenotype.network,
+      network: :enn.start_link(phenotype.network),
       cortex: :enn.cortex(phenotype.network),
       actuators: for(x <- phenotype.actuators, do: Database.dirty_read!({:actuator, x})),
       sensors: for(x <- phenotype.sensors, do: Database.dirty_read!({:sensor, x})),
       data: %{}
     }
 
+    Logger.debug(what: "Starting phenotype")
     {:next, &enter_sensors/1, [state]}
   end
 
@@ -73,6 +75,7 @@ defmodule Phenotype do
   Gets the signals from the phenotype sensors
   """
   def enter_sensors(state) do
+    Logger.debug(what: "Entering sensors")
     run_sensors([], state.sensors, state)
   end
 
@@ -87,6 +90,7 @@ defmodule Phenotype do
   end
 
   def run_sensors(signals, [], state) do
+    Logger.debug(what: "Exiting sensors", signals: signals)
     {:next, &enter_actuators/2, [signals, state]}
   end
 
@@ -95,6 +99,7 @@ defmodule Phenotype do
   """
   def enter_actuators(signals, state) do
     predictions = :cortex.predict(state.cortex, signals)
+    Logger.debug(what: "Entering actuators", predictions: predictions)
     run_actuators([], 0.0, predictions, state.actuators, state)
   end
 
@@ -109,7 +114,7 @@ defmodule Phenotype do
         run_actuators([err | errs], s_acc, px, ax, %{state | data: data})
 
       {:stop, reason} ->
-        terminate(reason, [], state)
+        terminate(reason, [{:score, s_acc}], state)
 
       {:stop, reason, score} ->
         terminate(reason, [{:score, score + s_acc}], state)
@@ -118,6 +123,7 @@ defmodule Phenotype do
 
   def run_actuators(errors, score_acc, [], [], state) do
     _bp_errors = :cortex.fit(state.cortex, errors)
+    Logger.debug(what: "Exiting actuators", errors: errors, score: score_acc)
     {:next, &enter_sensors/1, [state], [{:score, score_acc}]}
   end
 
@@ -125,7 +131,8 @@ defmodule Phenotype do
   Terminates the
   """
   def terminate(reason, actions, state) do
-    :enn.stop(state.network)
+    :ok = :enn.stop(state.network)
+    Logger.debug(what: "Terminating agent", reason: reason, actions: actions)
     {:stop, reason, actions}
   end
 
@@ -138,7 +145,7 @@ defmodule Phenotype do
   end
 
   defp select(name) do
-    group = Database.dirty_read!({:group, name})
+    group = Database.read!({:group, name})
     Enum.random(group.members)
   end
 end
