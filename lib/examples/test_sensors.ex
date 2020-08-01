@@ -35,8 +35,13 @@ defmodule TestSensors do
     {:ok, signal, %{state | i1: signal, seq_1: sx.()}}
   end
 
-  def seq_1(%{i1: _} = state), do: seq_1(Map.put(state, :seq_1, lazy_seq(@xor_seq)))
-  def seq_1(%{} = state), do: seq_1(Map.put(state, :i1, []))
+  def seq_1(%{i1: _} = state) do
+    seq_1(Map.put(state, :seq_1, lazy_seq(@xor_seq)))
+  end
+
+  def seq_1(%{} = state) do
+    seq_1(Map.put(state, :i1, []))
+  end
 
   @doc """
   Returns a boolean in an specific sequence.
@@ -49,8 +54,13 @@ defmodule TestSensors do
     {:ok, signal, %{state | i2: signal, seq_2: sx.()}}
   end
 
-  def seq_2(%{i2: _} = state), do: seq_2(Map.put(state, :seq_2, lazy_seq(@xor_seq)))
-  def seq_2(%{} = state), do: seq_2(Map.put(state, :i2, []))
+  def seq_2(%{i2: _} = state) do
+    seq_2(Map.put(state, :seq_2, lazy_seq(@xor_seq)))
+  end
+
+  def seq_2(%{} = state) do
+    seq_2(Map.put(state, :i2, []))
+  end
 
   ### =================================================================
   ###  Internal functions
