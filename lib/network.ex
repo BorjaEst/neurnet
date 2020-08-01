@@ -18,28 +18,34 @@ defmodule Network do
   @spec mutate_network(:enn.network()) :: :enn.network()
   def mutate_network(network) do
     :nnet.clone(network)
-    |> maybe_divide_neuron
+    |> maybe_split_neuron
+    |> maybe_join_neuron
     |> maybe_del_connections
     |> maybe_add_connections
     |> maybe_mutate_neurons
   end
 
   @chance 0.05
-  defp maybe_divide_neuron(network) do
-    maybe(@chance, network, &divide_neuron/1)
+  defp maybe_split_neuron(network) do
+    maybe(@chance, network, &split_neuron/1)
   end
 
-  @chance 0.25
+  @chance 0.05
+  defp maybe_join_neuron(network) do
+    maybe(@chance, network, &join_neurons/1)
+  end
+
+  @chance 0.15
   defp maybe_del_connections(network) do
     maybe(@chance, network, &del_connections/1)
   end
 
-  @chance 0.25
+  @chance 0.15
   defp maybe_add_connections(network) do
     maybe(@chance, network, &add_connections/1)
   end
 
-  @chance 0.75
+  @chance 0.25
   defp maybe_mutate_neurons(network) do
     maybe(@chance, network, &mutate_neurons/1)
   end
@@ -68,11 +74,19 @@ defmodule Network do
   ###  Mutation transactions
   ### =================================================================
 
-  # Divides a neuron ------------------------------------------------
-  defp divide_neuron(network) do
+  # Splits a neuron ------------------------------------------------
+  defp split_neuron(network) do
     nnodes = :network.nnodes(network)
     neuron = :ltools.randnth(Map.keys(nnodes))
-    :nnet.divide(neuron, network)
+    :nnet.split(neuron, network)
+  end
+
+  # Joins 2 neurons -------------------------------------------------
+  defp join_neurons(network) do
+    nnodes = :network.nnodes(network)
+    neuron1 = :ltools.randnth(Map.keys(nnodes))
+    neuron2 = :ltools.randnth(Map.keys(nnodes))
+    :nnet.join({neuron1, neuron2}, network)
   end
 
   # Deletes random connections from the network ---------------------
