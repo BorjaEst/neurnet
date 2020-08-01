@@ -22,7 +22,7 @@ defmodule Phenotype do
     {:atomic, phenotype} =
       :mnesia.transaction(fn ->
         %Phenotype{
-          network: :enn.compile(genotype.model),
+          network: :nnet.compile(genotype.model),
           actuators: select(genotype.actuators),
           sensors: select(genotype.sensors)
         }

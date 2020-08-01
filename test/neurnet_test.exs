@@ -61,9 +61,11 @@ defmodule NeurnetTest do
   test "Run training of dummy gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_dummy, :dummy_gate, 4, stop_condition)
+    [champion | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(result.population.run_data)
+    IO.inspect(what: "Training results", results: result.population.run_data)
+    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
   end
@@ -71,9 +73,11 @@ defmodule NeurnetTest do
   test "Training of simple gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_simple, :simple_gate, 4, stop_condition)
+    [champion | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(result.population.run_data)
+    IO.inspect(what: "Training results", results: result.population.run_data)
+    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
   end
@@ -81,9 +85,11 @@ defmodule NeurnetTest do
   test "Training of complex gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_complex, :complex_gate, 4, stop_condition)
+    [champion | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(result.population.run_data)
+    IO.inspect(what: "Training results", results: result.population.run_data)
+    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
   end
