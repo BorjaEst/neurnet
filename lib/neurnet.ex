@@ -35,7 +35,7 @@ defmodule Neurnet do
   @doc """
   Returns the phenotype information.
   """
-  @spec info(phenotype()) :: phenotype()
+  @spec info(phenotype()) :: term()
   def info(agent) do
     {:atomic, info} =
       :mnesia.transaction(fn ->
@@ -46,7 +46,7 @@ defmodule Neurnet do
           sensors: phenotype.sensors,
           network: %{
             id: phenotype.network,
-            info: :nnet.info(phenotype.network, :out)
+            info: :nnet.info(phenotype.network)
           }
         }
       end)
