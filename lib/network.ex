@@ -25,22 +25,22 @@ defmodule Network do
     |> maybe_mutate_neurons
   end
 
-  @chance 0.05
+  @chance 0.10
   defp maybe_split_neuron(network) do
     maybe(@chance, network, &split_neuron/1)
   end
 
-  @chance 0.05
+  @chance 0.10
   defp maybe_join_neuron(network) do
     maybe(@chance, network, &join_neurons/1)
   end
 
-  @chance 0.15
+  @chance 0.10
   defp maybe_del_connections(network) do
     maybe(@chance, network, &del_connections/1)
   end
 
-  @chance 0.15
+  @chance 0.10
   defp maybe_add_connections(network) do
     maybe(@chance, network, &add_connections/1)
   end
