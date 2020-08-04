@@ -54,6 +54,17 @@ defmodule Neurnet do
     info
   end
 
+  @spec architecture(phenotype()) :: :ok
+  def architecture(agent) do
+    {:atomic, architecture} =
+      :mnesia.transaction(fn ->
+        %{arguments: [phenotype]} = :eevo.info(agent)
+        :umlnn.format(phenotype.network)
+      end)
+
+    :io.format(architecture)
+  end
+
   @doc """
   Runs a phenotypes out of a population
   """
