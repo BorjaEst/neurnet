@@ -31,7 +31,7 @@ defmodule TestActuators do
   """
   def xor_score(), do: []
 
-  @train_cycles 100
+  @train_cycles 400
   @test_cycles 4
   @spec xor_score(number, map) :: Actuator.result()
   def xor_score(signal, %{cycle: cycle} = state) do
@@ -60,8 +60,10 @@ defmodule TestActuators do
 
   @spec null(number, map) :: Actuator.result()
   def null(_signal, state) do
-    score = 0.0
-    {:ok, score, state}
+    case :rand.uniform() do
+      x when x > 0.1 -> {:ok, 0.0, state}
+      _ -> {:stop, :normal, 0.001}
+    end
   end
 
   ### =================================================================
