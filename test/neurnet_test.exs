@@ -14,7 +14,9 @@ defmodule NeurnetTest do
 
     assert [] == ph_info.actuators -- [:xor_score, :null]
     assert [] == ph_info.sensors -- [:seq_1, :seq_2]
-    # assert ph_info.network.nnodes
+    assert 3 == ph_info.network.info.size
+    assert 2 == ph_info.network.info.inputs
+    assert 1 == ph_info.network.info.outputs
   end
 
   test "Phenotype mutation" do
@@ -61,36 +63,48 @@ defmodule NeurnetTest do
   test "Run training of dummy gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_dummy, :dummy_gate, 4, stop_condition)
-    [champion | _] = result.top3
+    [{_, champion} | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(what: "Training results", results: result.population.run_data)
-    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
+
+    IO.inspect(
+      what: "-------Training results: dummy gate----------",
+      run_data: result.population.run_data,
+      best_agent: Neurnet.info(champion)
+    )
   end
 
   test "Training of simple gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_simple, :simple_gate, 4, stop_condition)
-    [champion | _] = result.top3
+    [{_, champion} | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(what: "Training results", results: result.population.run_data)
-    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
+
+    IO.inspect(
+      what: "-------Training results: dummy gate----------",
+      run_data: result.population.run_data,
+      best_agent: Neurnet.info(champion)
+    )
   end
 
   test "Training of complex gate" do
     stop_condition = fn %{generation: x} -> x > 25 end
     result = Neurnet.run(:test_complex, :complex_gate, 4, stop_condition)
-    [champion | _] = result.top3
+    [{_, champion} | _] = result.top3
 
     assert result.population.run_data.generation >= 25
-    IO.inspect(what: "Training results", results: result.population.run_data)
-    IO.inspect(what: "Champio info", info: Neurnet.info(champion))
     assert is_map(result.tree)
     assert map_size(result.tree) > 0
+
+    IO.inspect(
+      what: "-------Training results: complex gate--------",
+      run_data: result.population.run_data,
+      best_agent: Neurnet.info(champion)
+    )
   end
 end
