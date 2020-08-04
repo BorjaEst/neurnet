@@ -64,6 +64,7 @@ defmodule Phenotype do
 
     state = %{
       network: :enn.start_link(phenotype.network),
+      net_info: network_info,
       score_f: score_factor(network_info),
       cortex: :enn.cortex(phenotype.network),
       actuators: for(x <- phenotype.actuators, do: Database.dirty_read!({:actuator, x})),
@@ -121,23 +122,26 @@ defmodule Phenotype do
         terminate(reason, s_acc, state)
 
       {:stop, reason, score} ->
-        terminate(reason, score + s_acc, state)
+        s_acc = score + s_acc
+        terminate(reason, s_acc, state)
     end
   end
 
   def run_actuators(errors, score_acc, [], [], state) do
     _bp_errors = :cortex.fit(state.cortex, errors)
-    Logger.debug(what: "Exiting actuators", errors: errors, score: score_acc, score_f: state.score_f)
-    {:next, &enter_sensors/1, [state], [{:score, score_acc * state.score_f}]}
+    score = score_acc * state.score_f
+    Logger.debug(what: "Exiting actuators", errors: errors, score: score)
+    {:next, &enter_sensors/1, [state], [{:score, score}]}
   end
 
   @doc """
-  Terminates the
+  Terminates the phenotype
   """
   def terminate(reason, score_acc, state) do
     :ok = :enn.stop(state.network)
-    Logger.debug(what: "Terminating agent", reason: reason, score: score_acc, score_f: state.score_f)
-    {:stop, reason, [{:score, score_acc * state.score_f}]}
+    score = score_acc * state.score_f
+    Logger.debug(what: "Terminating agent", reason: reason, score: score)
+    {:stop, reason, [{:score, score}]}
   end
 
   ### =================================================================
@@ -153,7 +157,8 @@ defmodule Phenotype do
     Enum.random(group.members)
   end
 
+  @square_e 7.3890560989306495
   defp score_factor(network_info) do
-    1 / (1 + :math.log10(network_info.size))
+    0.5 + 1 / :math.log(@square_e + network_info.size)
   end
 end
