@@ -51,3 +51,6 @@ rebar.lock
 # vscode
 .vscode
 
+# Custom files
+run_test.exs
+
